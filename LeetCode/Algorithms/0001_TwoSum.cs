@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LeetCode.Algorithms;
 
-class TwoSum_1
+class _0001_TwoSum
 {
     public int[] TwoSum(int[] nums, int target) {
 
