@@ -1,7 +1,7 @@
-namespace LeetCode.Algorithms;
-
 using System;
 using System.Collections.Generic;
+
+namespace LeetCode.Algorithms;
 
 class TwoSum_1
 {
