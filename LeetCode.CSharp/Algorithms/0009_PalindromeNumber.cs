@@ -22,7 +22,6 @@ public class _0009_PalindromeNumber
             return false;
         }
         int reversedHalf = 0;
-        int originalInt = x;
         while (x > reversedHalf)
         {
             reversedHalf = reversedHalf * 10 + x % 10;

@@ -31,3 +31,16 @@ This repository is a personal practice space for the user to learn C# / .NET. **
 - Explain what you'd change and why, point at the file and line, and let the user apply the change themselves.
 - Doc-only updates (CLAUDE.md, README) and read-only investigation are fine to do directly.
 - If the user explicitly asks you to make a code change ("go ahead and fix it", "apply that"), then edit — but the default is teach, not do.
+
+## Reviewing solutions
+
+When the user finishes a problem or asks for a review, give a structured read without auto-editing:
+
+- **Correctness** — walk the algorithm, call out edge cases that pass and any that look suspicious (overflow, empty input, duplicates, negatives, off-by-one).
+- **Idiomatic C# / .NET** — comment on language usage (collection expressions, `TryGetValue` vs indexer, LINQ vs loops, nullable annotations, `Span<T>` opportunities). This repo is partly about learning the language, so call these out even when the algorithm is fine.
+- **Complexity** — state time/space and whether a more standard approach (two-pointer, sliding window, hash map, DP, etc.) would be expected for the problem.
+- **Dead code / warnings** — flag unused locals or dead branches. The project sets `TreatWarningsAsErrors` with `CS0168;CS0219` exempted, so these compile but are still worth pointing out.
+
+## Follow-up suggestions
+
+After a review, suggest 2–4 concrete next problems (number + title) that build on what was just practiced — e.g. another hash-map problem after Two Sum, another digit-manipulation problem after Palindrome Number. Keep the list short so the user can pick one and continue.
