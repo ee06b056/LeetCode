@@ -16,7 +16,7 @@ public class _0001_TwoSum
             {
                 return [index, i];
             }
-            dict.Add(value, i);
+            dict.TryAdd(value, i);
         }
         
         throw new InvalidOperationException("No two sum solution");
