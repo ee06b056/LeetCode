@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LeetCode.Algorithms;
+namespace LeetCode.CSharp.Algorithms;
 
 class _0001_TwoSum
 {
@@ -15,6 +15,7 @@ class _0001_TwoSum
             {
                 return new int[] {i, compNum};
             }
+            set.Add(i);
         }
         
         return Array.Empty<int>();

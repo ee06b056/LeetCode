@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LeetCode;
+namespace LeetCode.CSharp;
 
 class Program
 {
