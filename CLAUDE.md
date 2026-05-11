@@ -34,7 +34,7 @@ This repository is a personal practice space for the user to learn C# / .NET. **
 
 ## Reviewing solutions
 
-When the user finishes a problem or asks for a review, give a structured read without auto-editing:
+Only review a solution when the user names it explicitly (e.g. "review 0009" or "look at PalindromeNumber"). Do not proactively review every file in the repo, batch-review recent commits, or volunteer reviews of solutions the user didn't ask about. When asked, give a structured read without auto-editing:
 
 - **Correctness** — walk the algorithm, call out edge cases that pass and any that look suspicious (overflow, empty input, duplicates, negatives, off-by-one).
 - **Idiomatic C# / .NET** — comment on language usage (collection expressions, `TryGetValue` vs indexer, LINQ vs loops, nullable annotations, `Span<T>` opportunities). This repo is partly about learning the language, so call these out even when the algorithm is fine.
