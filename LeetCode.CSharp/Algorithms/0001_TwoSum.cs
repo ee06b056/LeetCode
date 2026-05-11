@@ -3,21 +3,22 @@ using System.Collections.Generic;
 
 namespace LeetCode.CSharp.Algorithms;
 
-class _0001_TwoSum
+public class _0001_TwoSum
 {
-    public int[] TwoSum(int[] nums, int target) {
-
-        var set = new HashSet<int>();
-        foreach (var i in nums)
+    public int[] TwoSum(int[] nums, int target) 
+    {
+        var dict = new Dictionary<int, int>();
+        for (int i = 0; i < nums.Length; i++)
         {
-            var compNum = target - i;
-            if (set.Contains(compNum))
+            var value = nums[i];
+            var complement = target - value;
+            if (dict.TryGetValue(complement, out var index))
             {
-                return new int[] {i, compNum};
+                return [index, i];
             }
-            set.Add(i);
+            dict.Add(value, i);
         }
         
-        return Array.Empty<int>();
+        throw new InvalidOperationException("No two sum solution");
     }
 }
