@@ -4,6 +4,8 @@ namespace LeetCode.CSharp.Algorithms;
 
 public class _0014_LongestCommonPrefix
 {
+    // TODO: revisit — algorithm is correct O(n*m) vertical scan, but the StringBuilder + `flag` pattern can be cleaner:
+    //   use a plain for-loop, early-return strs[0].Substring(0, i) on mismatch, drop the flag entirely.
     public string LongestCommonPrefix(string[] strs)
     {
         if ( strs.Length == 0 )
