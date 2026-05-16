@@ -61,5 +61,18 @@ class Program
         linkedList1.RemoveFirst();
         linkedList1.RemoveLast();
         int llCount = linkedList1.Count;
+
+        // Stack
+        Stack<int> stack1 = new();
+        Stack<int> stack2 = new Stack<int>();
+        Stack<int> stack3 = new(6);
+        Stack<int> stack4 = new(capacity: 6);
+        Stack<int> stack5 = new(new int[] {1, 2, 3, 4, 5});
+        stack1.Push(1);
+        stack1.Peek();
+        stack1.Pop();
+        int count = stack1.Count;
+
+        
     }
 }
