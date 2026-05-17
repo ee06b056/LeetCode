@@ -12,19 +12,16 @@ namespace LeetCode.CSharp.Algorithms;
  * }
  */
 
-#nullable disable
-public class ListNode {
-    public int val;
-    public ListNode next;
-    public ListNode(int val=0, ListNode next=null) {
+public class _0021_MergeTwoSortedLists
+{
+    public class ListNode {
+        public int val;
+        public ListNode next;
+        public ListNode(int val=0, ListNode next=null) {
         this.val = val;
         this.next = next;
     }
 }
-#nullable restore
-
-public class _0021_MergeTwoSortedLists
-{
     public ListNode MergeTwoLists(ListNode list1, ListNode list2)
     {
         ListNode head = new();
