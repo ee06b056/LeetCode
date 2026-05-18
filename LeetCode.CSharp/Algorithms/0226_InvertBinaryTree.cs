@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace LeetCode.CSharp.Algorithms;
 
 /**
@@ -30,6 +32,21 @@ public class _0226_InvertBinaryTree
         TreeNode leftNode = root.left, rightNode = root.right;
         root.left = InvertTree(rightNode);
         root.right = InvertTree(leftNode);
+        return root;
+    }
+
+    public TreeNode InvertTreeDFS(TreeNode root) 
+    {
+        if (root == null) return null;
+        Stack<TreeNode> stack = new();
+        stack.Push(root);
+        while (stack.Count > 0)
+        {
+            TreeNode cp = stack.Pop();
+            (cp.left, cp.right) = (cp.right, cp.left);
+            if(cp.left != null) stack.Push(cp.left);
+            if(cp.right != null) stack.Push(cp.right);
+        }
         return root;
     }
 }
