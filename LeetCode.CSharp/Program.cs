@@ -139,5 +139,67 @@ class Program
         hashSet1.Contains(1);
         hashSet1.Remove(1);
         count = hashSet1.Count;
+
+
+        // HashMap Dictionary
+        Dictionary<int, string> dict1 = new();
+        var dict2 = new Dictionary<int, string>(9);
+        var dict3 = new Dictionary<int, string>(capacity: 10);
+        var dict4 = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var dict5 = new Dictionary<int, string> { [1] = "one", [2] = "two" };
+        var dict6 = new Dictionary<int, string> { {1, "one"}, {2, "two"} };
+        dict1[1] = "newone";
+        dict1.Add(2, "two");
+        dict1.TryAdd(3, "three");
+        dict1.TryGetValue(1, out string value);
+        dict1.GetValueOrDefault(1, "default");
+        dict1.Remove(1);
+        dict1.ContainsKey(2);
+        dict1.ContainsValue("two");
+        count = dict1.Count;
+        var keys = dict1.Keys;
+        var values = dict1.Values;
+        foreach (var kvp in dict1)
+        {
+            int key = kvp.Key;
+            string val = kvp.Value;
+        }
+        foreach (int key in dict1.Keys)
+        {
+            string val = dict1[key];
+        }
+
+        // SortedDictionary && SortedSet
+        SortedDictionary<int, string> sortedDict1 = new();
+        var sortedDict2 = new SortedDictionary<int, string>(Comparer<int>.Create((x, y) => y.CompareTo(x)));
+        SortedSet<int> sortedSet1 = new();
+        sortedDict1.Add(2, "two");
+        sortedDict1[3] = "three";
+        sortedDict1.TryAdd(1, "one");
+        sortedDict1.TryGetValue(2, out string sortedValue);
+        sortedDict1.GetValueOrDefault(2, "default");
+        sortedDict1.Remove(2);
+        sortedDict1.ContainsKey(3);
+        sortedDict1.ContainsValue("three");
+        count = sortedDict1.Count;
+        var sortedKeys = sortedDict1.Keys;
+        var sortedValues = sortedDict1.Values;
+        foreach (var kvp in sortedDict1)  // SortedDictionary is sorted by key, so the order of keys is guaranteed to be sorted, but the order of values is not guaranteed to be sorted
+        {
+            int key = kvp.Key;
+            string val = kvp.Value;
+        }
+
+        var sortedSet2 = new SortedSet<int>(Comparer<int>.Create((x, y) => y.CompareTo(x)));
+        var sortedSet3 = new SortedSet<int>{1, 2, 3, 4};
+        var sortedSet4 = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+        sortedSet1.Add(1);
+        sortedSet1.Contains(1);
+        sortedSet1.Remove(1);
+        count = sortedSet1.Count;
+        int sortedSetMin = sortedSet1.Min;
+        int sortedSetMax = sortedSet1.Max;
+        SortedSet<int> sortedSetSubset = sortedSet1.GetViewBetween(2, 4);
+        int subsetCount = sortedSetSubset.Count;
     }
 }
