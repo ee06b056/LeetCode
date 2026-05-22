@@ -45,6 +45,7 @@ class Program
         int[,] grid3 = {{1,2,3}, {4,5,6}, {3, 4, 5}};
         int[][] grid4 = [[1, 2, 3], [4, 5, 6], [3, 4, 5]];
         int[][] grid5 = new int[3][];
+        var grid6 = new int[3][];
         for (int i = 0; i < grid5.Length; i++) grid5[i] = new int[4];
         // allays use int[][] jagged in leetcode
 
@@ -137,6 +138,7 @@ class Program
         hashSet1.Add(1);
         hashSet1.Contains(1);
         hashSet1.Remove(1);
+        hashSet1.Add(1);
         count = hashSet1.Count;
 
 
