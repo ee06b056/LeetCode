@@ -28,6 +28,8 @@ class Program
         tupleSet.Add(t2);
         tupleSet.Add(t3);
         var name1 = t4.name;
+        var t5 = (1, 2, 3);
+        var (v1, v2, v3) = t5;
         
         // Array
         var stringArray = new string[5];
@@ -101,6 +103,8 @@ class Program
         Queue<int> queue3 = new(6);
         Queue<int> queue4 = new(capacity: 6);
         Queue<int> queue5 = new(new int[] {1, 2, 3});
+        var queue6 = new Queue<(int, int, int)>();
+        queue6.Enqueue((1, 3, 4));
         queue1.Enqueue(1);
         queue1.Enqueue(2);
         queue1.Enqueue(2);
