@@ -73,7 +73,7 @@ class Program
         list1.Insert(2, 4);
         list1.Sort();
         list1.AddRange(list2);
-        list1.AddRange(null);
+        // AddRange can't handle null input: list1.AddRange(null);
 
         // LinkedList
         // in C#, LinkedList is in System.Collections.Generic namespace, and it's a doubly linked list, not a singly linked list
