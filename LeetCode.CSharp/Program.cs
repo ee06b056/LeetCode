@@ -72,6 +72,8 @@ class Program
         list1.AddRange(list4);
         list1.Insert(2, 4);
         list1.Sort();
+        list1.AddRange(list2);
+        list1.AddRange(null);
 
         // LinkedList
         // in C#, LinkedList is in System.Collections.Generic namespace, and it's a doubly linked list, not a singly linked list
@@ -194,7 +196,6 @@ class Program
             int key = kvp.Key;
             string val = kvp.Value;
         }
-
         var sortedSet2 = new SortedSet<int>(Comparer<int>.Create((x, y) => y.CompareTo(x)));
         var sortedSet3 = new SortedSet<int>{1, 2, 3, 4};
         var sortedSet4 = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -206,5 +207,15 @@ class Program
         int sortedSetMax = sortedSet1.Max;
         SortedSet<int> sortedSetSubset = sortedSet1.GetViewBetween(2, 4);
         int subsetCount = sortedSetSubset.Count;
+        
+        // TreeNode
+        TreeNode root = new TreeNode(1);
+    }
+
+    public class TreeNode(int val = 0, Program.TreeNode left = null, Program.TreeNode right = null)
+    {
+        public int val = val;
+        public TreeNode Left = left;
+        public TreeNode Right = right;
     }
 }
