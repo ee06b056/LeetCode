@@ -41,6 +41,20 @@ public class _0094_BinaryTreeInorderTraversal
         return inorderList;
     }
 
+    public IList<int> InorderTraversalRecursive(TreeNode root)
+    {
+        static void Helper(TreeNode node, List<int> list)
+        {
+            if (node == null) return;
+            Helper(node.left, list);
+            list.Add(node.val);
+            Helper(node.right, list);
+        }
+        var inorderList = new List<int>();
+        Helper(root, inorderList);
+        return inorderList;
+    }
+
     public IList<int> InorderTraversalIterative(TreeNode root) 
     {
         var inorderList = new List<int>();

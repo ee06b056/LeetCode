@@ -41,6 +41,20 @@ public class _0145_BinaryTreePostorderTraversal
         return postorderList;
     }
 
+    public IList<int> PostorderTraversalRecursive(TreeNode root)
+    {
+        static void Helper(TreeNode node, List<int> list)
+        {
+            if (node == null) return;
+            Helper(node.left, list);
+            Helper(node.right, list);
+            list.Add(node.val);
+        }
+        var postorderList = new List<int>();
+        Helper(root, postorderList);
+        return postorderList;
+    }
+
     public IList<int> PostorderTraversalIterative(TreeNode root)
     {
         if (root == null) return new int[0];

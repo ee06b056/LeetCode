@@ -40,6 +40,20 @@ public class _0144_BinaryTreePreorderTraversal
         return preorderList;
     }
 
+    public IList<int> PreorderTraversalRecursive(TreeNode root)
+    {
+        static void Helper(TreeNode node, List<int> list)
+        {
+            if (node == null) return;
+            list.Add(node.val);
+            Helper(node.left, list);
+            Helper(node.right, list);
+        }
+        var preorderList = new List<int>();
+        Helper(root, preorderList);
+        return preorderList;
+    }
+
     public IList<int> PreorderTraversalIterative(TreeNode root)
     {
         var currentNode = root;
