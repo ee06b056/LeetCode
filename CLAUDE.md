@@ -59,7 +59,7 @@ Problems use **four-digit zero-padded numbers** across both languages — the le
 
 - Solutions live in `LeetCode.Python/algorithms/`.
 - Files are named `p<ZeroPaddedNumber>_<snake_case_problem_name>.py` (e.g. `p0001_two_sum.py`). The `p` prefix sidesteps the "identifiers can't start with a digit" constraint while keeping the four-digit number scannable; a leading underscore is avoided because it carries "private by convention" meaning in Python.
-- The solution class is always `class Solution:` with the method signature LeetCode provides (e.g. `def two_sum(self, nums: list[int], target: int) -> list[int]:`). This matches what gets pasted into LeetCode's submission box, so solutions are copy-paste portable in either direction.
+- The solution class is always `class Solution:` with the method signature LeetCode provides verbatim (e.g. `def twoSum(self, nums: list[int], target: int) -> list[int]:`). **Method names stay in LeetCode's camelCase**, not PEP 8 snake_case — this deviates from normal Python style on purpose, so solutions are copy-paste portable in either direction with LeetCode's submission box without renaming. Filenames remain snake_case (`p0001_two_sum.py`); only the method name follows LeetCode.
 - Type hints are encouraged on solution signatures (matches LeetCode's stub style and documents intent) but optional inside method bodies.
 - `program.py` at the Python project root is a scratch file for chunk-by-chunk language exploration — mirrors `LeetCode.CSharp/Program.cs`. Not wired into anything; run with `python program.py`.
 - Tests live in `LeetCode.Python/tests/algorithms/`, mirroring the source layout. One file per problem, named `test_p<ZeroPaddedNumber>_<snake_case_problem_name>.py` (e.g. `test_p0001_two_sum.py`). Use plain `def test_*` functions (pytest style, not `unittest.TestCase` classes). Prefer `@pytest.mark.parametrize` for the LeetCode example cases.
@@ -81,7 +81,7 @@ Only review a solution when the user names it explicitly (e.g. "review 0009" or 
 - **Correctness** — walk the algorithm, call out edge cases that pass and any that look suspicious (overflow, empty input, duplicates, negatives, off-by-one).
 - **Idiomatic language usage** — comment on language-specific patterns. This repo is partly about learning the languages, so call these out even when the algorithm is fine.
   - **C# / .NET**: collection expressions, `TryGetValue` vs indexer, LINQ vs loops, nullable annotations, `Span<T>` opportunities.
-  - **Python**: comprehensions vs explicit loops, `dict.get(k, default)` vs `if k in d`, `enumerate` / `zip` over manual indexing, the `collections` module (`Counter`, `defaultdict`, `deque`), `heapq`, `bisect`, walrus `:=` where it genuinely simplifies, f-strings, unpacking.
+  - **Python**: comprehensions vs explicit loops, `dict.get(k, default)` vs `if k in d`, `enumerate` / `zip` over manual indexing, the `collections` module (`Counter`, `defaultdict`, `deque`), `heapq`, `bisect`, f-strings, unpacking. **Do not suggest the walrus operator (`:=`)** — it's hard to read for someone still learning Python and obscures intent more than it shortens code.
 - **Complexity** — state time/space and whether a more standard approach (two-pointer, sliding window, hash map, DP, etc.) would be expected for the problem.
 - **Dead code / warnings** — flag unused locals or dead branches. The C# project sets `TreatWarningsAsErrors` with `CS0168;CS0219` exempted, so these compile but are still worth pointing out. Python doesn't enforce this at the compiler level — call out lint-style issues directly.
 
