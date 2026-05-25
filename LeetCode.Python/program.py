@@ -324,3 +324,128 @@ for i in range(5):
 while n > 0:
     print(n)
     n -= 1
+
+# === 11.Comprehensions ===
+
+print("-- comprehensions --")
+
+# list comprehension
+squares = [x ** 2 for x in range(10)] # create a list of squares from 0 to 9
+print(squares) # [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+even_squares = [x ** 2 for x in range(10) if x % 2 == 0] # create a list of squares of even numbers from 0 to 9
+print(even_squares) # [0, 4, 16, 36, 64]
+
+# Transforming and filtering with comprehensions
+pairs = [(i, x) for i, x in enumerate("abcde")] # create a list of pairs of index and character from the string
+print(pairs) # [(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd'), (4, 'e')]
+
+# Nested comprehensions
+grid = [[(i, j) for j in range(3)] for i in range(3)] # create a 3x3 grid of coordinate pairs
+print(grid) # [[(0, 0), (0, 1), (0, 2)], [(1, 0), (1, 1), (1, 2)], [(2, 0), (2, 1), (2, 2)]]
+coords = [(i, j) for i in range(4) for j in range(3)] # same as above, but with a single comprehension, evaluated from left to right
+print(coords) # [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2), (3, 0), (3, 1), (3, 2)]
+# flatten a grid
+grid = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+x = -1
+flattened = [y for row in grid for y in row]
+print(flattened) # [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# Dict comprehension
+d = {x: x * x for x in range(5)} # create a dictionary mapping numbers to their squares
+print(d) # {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
+
+# Set comprehension
+s = {x ** 3 for x in range(10) if x % 2 == 1} # create a set of cubes of odd numbers from 0 to 9
+print(s) # {1, 27, 729, 343, 125}
+
+# Generator expression - creates an iterator that generates values on the fly, can be used with functions like sum() or to create a list with list()
+gen = (x ** 2 for x in range(100)) # create a generator of squares from 0 to 99
+next(gen) # 0
+next(gen) # 1
+next(gen) # 4
+numberSum = sum(x for x in range(10)) # sum of squares from 0 to 9, using a generator expression inside the sum() function
+print(numberSum) # 45
+
+# === 12. Functions ===
+
+print("-- functions --")
+
+# Function definition
+def greet(name):
+    return f"Hello, {name}!" # return a greeting message using an f-string
+print(greet("Bo")) # Hello, Bo!
+
+# Default arguments
+def power(base, exponent=2):
+    return base ** exponent # return the result of raising base to the power of exponent, default is 2 for squares
+print(power(3)) # 9, because exponent defaults to 2
+print(power(3, 3)) # 27, because exponent is specified as 3
+
+# Variable-length arguments
+def sum_all(*args):
+    return sum(args) # return the sum of all arguments, *args collects all positional arguments into a tuple
+print(sum_all(1, 2, 3)) # 6
+
+def print_key_values(**kwargs):
+    for key, value in kwargs.items():
+        print(f"{key}: {value}") # print each key-value pair, **kwargs collects all keyword arguments into a dictionary
+print_key_values(name="Alice", age=30, city="New York") # name: Alice, age: 30, city: New York
+
+def mixed_args(*args, **kwargs):
+    print("Positional arguments:", args) # print the tuple of positional arguments
+    print("Keyword arguments:", kwargs) # print the dictionary of keyword arguments
+mixed_args(1, 2, 3, name="Alice", age=30)
+
+# type hints - optional annotations for function parameters and return types, not enforced at runtime but can be used by static type checkers
+def add(x: int, y: int) -> int:
+    return x + y
+print(add(3, 4)) # 7
+
+# multiple return values
+def min_max(nums):
+    return min(nums), max(nums) # return a tuple of the minimum and maximum values in the list
+lo, hi = min_max([3, 1, 4, 1, 5])
+print(lo, hi) # 1 5
+
+# Lambda functions - anonymous functions defined with the lambda keyword, can be used for short, throwaway functions
+square = lambda x: x * x # create a lambda function that squares its input
+print(square(5)) # 25
+nums = [(1, "b"), (2, "a"), (3, "c")]
+print(sorted(nums, key=lambda x: -x[0])) # sort the list of tuples in reverse order based on the first element of the tuple, using a lambda function as the key
+
+# don't initialize mutable default arguments like lists or dictionaries, because they are shared across all calls to the function, use None and create a new object inside the function instead
+def append_to_list(value, lst=None):
+    if lst is None:
+        lst = [] # create a new list for each call if lst is not provided
+    lst.append(value)
+    return lst
+print(append_to_list(1)) # [1]
+print(append_to_list(2)) # [2], not [1, 2]
+
+# === 13. Classes ===
+
+print("-- classes --")
+
+class Point:
+    # Constructor method, called when a new instance is created
+    def __init__(self, x, y): # constructor name is always __init__, self is the instance being created, x and y are parameters for the constructor
+        self.x = x # assign the x parameter to an instance variable
+        self.y = y # assign the y parameter to an instance variable
+    
+    # Instance Method - first parameter is always self, which refers to the instance on which the method is called
+    def distance_to_origin(self):
+        return (self.x ** 2 + self.y ** 2) ** 0.5 # calculate the distance from the point to the origin using the Pythagorean theorem
+    
+    # __repr__ method - defines the string representation of the object, used by the repr() function and in the interactive interpreter
+    def __repr__(self):
+        return f"Point({self.x}, {self.y})" # return a string representation of the point
+
+p = Point(3, 4) # create a new instance of the Point class
+print(p) # Point(3, 4), calls the __repr__ method to get the string representation of the point
+print(p.distance_to_origin()) # 5.0, calls the distance_to_origin method on the point instance
+
+# Leetcode's expected class definition:
+class Solution:
+    def two_sum(self, nums: list[int], target: int) -> list[int]:
+        # implementation goes here
+        pass
