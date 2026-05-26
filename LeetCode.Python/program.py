@@ -449,3 +449,205 @@ class Solution:
     def two_sum(self, nums: list[int], target: int) -> list[int]:
         # implementation goes here
         pass
+
+# === 14 collections.Counter ===
+
+print("-- collections.Counter --")
+
+from collections import Counter
+c = Counter("banana") # create a Counter object from a string, counts the frequency of each character
+print(c) # Counter({'a': 3, 'n': 2, 'b': 1})
+print(c["a"]) # 3, count of 'a'
+print(c["x"]) # 0, count of 'x', returns 0 for missing keys instead of raising KeyError
+c["a"] += 1 # increment the count of 'a' by 1
+print(c) # Counter({'a': 4, 'n': 2, 'b': 1})
+c.update("apple") # update the counts with another string, adds the counts of characters in "apple" to the existing counts
+print(c) # Counter({'a': 5, 'p': 2, 'l': 1, 'e': 1, 'n': 2, 'b': 1})
+most_common = c.most_common(2) # get the 2 most common elements and their counts, time complexity is O(n log k) where n is the number of unique elements and k is the number of most common elements to return
+print(most_common) # [('a', 5), ('n', 2)]
+
+# Counter artithmetic operations
+a = Counter("aabbc")
+b = Counter("abccd")
+print(a + b) # Counter({'a': 3, 'b': 3, 'c': 3, 'd': 1}), addition combines counts, keeps only positive counts
+print(a - b) # Counter({'a': 1, 'b': 1}), subtraction subtracts counts, keeps only positive counts
+print(a & b) # Counter({'a': 1, 'b': 1}), intersection takes the minimum of counts
+print(a | b) # Counter({'a': 3, 'b': 3, 'c': 3, 'd': 1}), union takes the maximum of counts
+
+# Equality - two Counter objects are equal if they have the same counts for all elements, even if they have different keys with zero counts
+c1 = Counter("aabb")
+c2 = Counter("aabb") + Counter("cc") - Counter("cc") # Counter({'a': 2, 'b': 2}), c1 and c2 have the same counts for 'a' and 'b', and both have zero counts for 'c', so
+print(c1 == c2) # True
+
+# Mutation
+c.update("abc") # update the counts with another string, adds the counts of characters in "abc" to the existing counts
+c.subtract("ab") # subtract the counts with another string, subtracts the counts of characters in "ab" from the existing counts
+
+# === 15. collections.defaultdict ===
+
+print("-- collections.defaultdict --")
+
+# A dict that auto-creates missing keys using a factory function provide. The factory function is called with no arguments to create a default value when a missing key is accessed. This can be useful for counting, grouping, or accumulating values without having to check if the key already exists in the dictionary.
+from collections import defaultdict
+ddict = defaultdict(int) # create a defaultdict with int as the default factory, missing keys will have a default value of 0
+for ch in "banana":
+    ddict[ch] += 1 # increment the count for each character, no need to check if the key exists because defaultdict will create it with a default value of 0
+print(ddict) # defaultdict(<class 'int'>, {'b': 1, 'a': 3, 'n': 2})
+print(ddict["x"]) # 0, accessing a missing key returns the default value of 0
+ddict["x"] += 1 # increment the count for 'x', now 'x' will have a count of 1
+print(ddict) # defaultdict(<class 'int'>, {'b': 1, 'a': 3, 'n': 2, 'x': 1})
+
+ddict = defaultdict(list) # create a defaultdict with list as the default factory, missing keys will have a default value of an empty list
+words = ["bat", "ball", "cat", "car", "dog"]
+for w in words:
+    key = "".join(sorted(w)) # sort the characters in the word to create a key for anagrams
+    ddict[key].append(w) # append the word to the list of anagrams for that key
+print(ddict) # defaultdict(<class 'list'>, {'abt': ['bat', 'tab'], 'abl': ['ball'], 'act': ['cat'], 'acr': ['car'], 'dgo': ['dog']})
+
+graph = defaultdict(set) # create a defaultdict with set as the default factory, missing keys will have a default value of an empty set
+edges = [(1, 2), (1, 3), (2, 3), (3, 4)]
+for u, v in edges:
+    graph[u].add(v) # add v to the set of neighbors for u
+    graph[v].add(u) # add u to the set of neighbors for v, assuming an undirected graph
+print(graph) # defaultdict(<class 'set'>, {1: {2, 3}, 2: {1, 3}, 3: {1, 2, 4}, 4: {3}})
+
+nested = defaultdict(lambda: {"count": 0, "items": []}) # create a defaultdict with a lambda function as the default factory, missing keys will have a default value of a dictionary with count and items
+nested["a"]["count"] += 1 # increment the count for key 'a', now nested['a'] will have {'count': 1, 'items': []}
+nested["a"]["items"].append(1) # append 1 to the items list for key 'a', now nested['a'] will have {'count': 1, 'items': [1]}
+print(nested) # defaultdict(<function <lambda> at 0x7ff8c0d0>, {'a': {'count': 1, 'items': [1]}}})
+
+# when trying to access a missing key in a defaultdict, the default factory function will be called to create a default value, and that value will be added to the dictionary with the missing key. This means that if you access a missing key multiple times, it will create multiple entries in the dictionary with the same default value, which can lead to unexpected behavior if the default value is mutable (like a list or a dictionary). To avoid this, it's important to use an immutable default value or to ensure that the default factory function creates a new object each time it's called.
+if "missing" in ddict: # check if the key "missing" is in the dictionary, this will return False because "missing" has not been accessed yet, so it has not been added to the dictionary
+    print("missing key exists in the dictionary")
+
+
+# === 16. collections.deque ===
+
+print("-- collections.deque --")
+
+# double-ended queue, append, appendleft, pop, popleft operations are O(1) time complexity, while list append and pop from the end are O(1) but insert and pop from the beginning are O(n) time complexity, so deque is more efficient for queue and stack operations
+from collections import deque
+dq = deque([1, 2, 3]) # create a deque with an initial list of elements
+print(dq) # deque([1, 2, 3])
+dq.append(4) # add an element to the right end of the deque
+dq.appendleft(-1) # add an element to the left end of the deque
+print(dq) # deque([-1, 1, 2, 3, 4])
+dq.pop() # remove and return the rightmost element, returns 4
+dq.popleft() # remove and return the leftmost element, returns -1
+print(dq) # deque([1, 2, 3])
+dq.extend([4, 5]) # add multiple elements to the right end of the deque
+dq.extendleft([-2, -3]) # add multiple elements to the left end of the deque, the order of the added elements will be reversed because they are added to the left
+print(dq) # deque([-3, -2, 1, 2, 3, 4, 5])
+dq.rotate(2) # rotate the deque to the right by 2 steps, the last 2 elements will be moved to the front
+print(dq) # deque([4, 5, -3, -2, 1, 2, 3])
+dq.rotate(-3) # rotate the deque to the left by 3 steps, the first 3 elements will be moved to the end
+print(dq) # deque([-2, 1, 2, 3, 4, 5, -3])
+
+windowdp = deque(maxlen=3) # create a deque with a maximum length of 3, when the deque exceeds this length, the oldest elements will be automatically removed from the left
+windowdp.extend([1, 2, 3]) # add elements to the deque
+windowdp.append(4) # add an element to the right end of the deque, now the deque will have [2, 3, 4] because the oldest element 1 is removed to maintain the maxlen of 3
+print(windowdp) # deque([2, 3, 4], maxlen=3)
+windowdp.appendleft(0) # add an element to the left end of the deque, now the deque will have [0, 2, 3] because the oldest element 4 is removed to maintain the maxlen of 3
+print(windowdp) # deque([0, 2, 3], maxlen=3
+
+# always dequeue for queues, and use append for stacks, but deque can be used for both queues and stacks efficiently
+
+# === 17. heapq - priority queue ===
+
+print("-- heapq --")
+import heapq
+
+h = [] # create an empty list to be used as a heap
+heapq.heappush(h, 5) # add an element to the heap, maintains the heap property
+heapq.heappush(h, 2) # add another element to the heap
+heapq.heappush(h, 8) # add another element to the heap
+print(h) # [2, 5, 8], the smallest element is at the root of the heap
+smallest = heapq.heappop(h) # remove and return the smallest element from the heap, maintains the heap property
+print(smallest) # 2
+print(h) # [5, 8], the heap is updated after popping the smallest element
+heapq.heappush(h, 1) # add another element to the heap
+print(h) # [1, 8, 5], the smallest element is now 1
+smallest = heapq.heappop(h) # remove and return the smallest element from the heap
+print(smallest) # 1
+print(h) # [5, 8], the heap is updated after popping the smallest element
+
+nums = [5, 2, 8, 1, 3]
+heapq.heapify(nums) # transform the list into a heap in-place, O(n)
+print(nums) # [1, 2, 8, 5, 3], the smallest element is at the root of the heap
+
+heapq.heappushpop(nums, 4) # push a new element and pop the smallest element in one operation, more efficient than doing heappush followed by heappop
+print(nums) # [2, 3, 8, 5, 4], the smallest element 1 is removed and 4 is added to the heap
+heapq.heapreplace(nums, 6) # pop the smallest element and push a new element in one operation, more efficient than doing heappop followed by heappush
+print(nums) # [3, 4, 8, 5, 6], the smallest element 2 is removed and 6 is added to the heap
+
+print(heapq.nsmallest(2, nums)) # get the 2 smallest elements from the heap, O(k log n) where k is the number of smallest elements to return
+print(nums) # [3, 4, 8, 5, 6], the original heap is unchanged
+print(heapq.nlargest(2, nums)) # get the 2 largest elements from the heap, O(k log n) where k is the number of largest elements to return
+print(nums) # [3, 4, 8, 5, 6], the original heap is unchanged
+
+max_h = [] # create an empty list to be used as a max heap, we can use a min heap to implement a max heap by negating the values
+heapq.heappush(max_h, -5) # add an element to the max heap
+heapq.heappush(max_h, -2) # add another element to the max heap
+heapq.heappush(max_h, -8) # add another element to the max heap
+print(max_h) # [-8, -2, -5], the largest element is at the root of the max heap (negated)
+largest = -heapq.heappop(max_h) # remove and return the largest element from the max heap, negate it back to get the original value
+print(largest) # 8
+
+task = []
+heapq.heappush(task, (3, "low priority task")) # add a task with a priority of 3
+heapq.heappush(task, (1, "high priority task")) # add a task
+heapq.heappush(task, (2, "medium priority task")) # add a task
+print(task) # [(1, 'high priority task'), (3, 'low priority task'), (2, 'medium priority task')], the task with the highest priority (lowest number) is at the root of the heap
+
+# === 18. bisect - binary search ===
+
+print("-- bisect --")
+import bisect
+
+sorted_list = [1, 3, 5, 7, 9] # create a sorted list, bisect functions assume the list is already sorted
+index = bisect.bisect_left(sorted_list, 5) # find the index where 5 should be inserted to maintain sorted order, if 5 is already in the list, it returns the index of the leftmost 5
+print(index) # 2
+index = bisect.bisect_right(sorted_list, 5) # find the index where 5 should be inserted to maintain sorted order, if 5 is already in the list, it returns the index of the rightmost 5
+index = bisect.bisect(sorted_list, 5) # same as bisect_right
+print(index) # 3
+bisect.insort(sorted_list, 6) # insert 6 into the sorted list while maintaining sorted order
+print(sorted_list) # [1, 3, 5, 6, 7, 9], 6 is inserted at the correct position to maintain sorted order
+
+def contains(nums, target):
+    index = bisect.bisect_left(nums, target) # find the index where target should be inserted
+    return index < len(nums) and nums[index] == target # check if the target is actually present at that index
+
+def count_occurrences(nums, target):
+    left_index = bisect.bisect_left(nums, target) # find the leftmost index of target
+    right_index = bisect.bisect_right(nums, target) # find the rightmost index of target
+    return right_index - left_index # return the count of occurrences
+
+# === 19. quick hits ===
+
+print("-- quick hits --")
+import itertools, math, string
+
+ids = itertools.count(1) # create an infinite iterator that generates consecutive integers starting from 1
+print(next(ids)) # 1
+print(next(ids)) # 2
+
+print(list(itertools.chain([1, 2], [3, 4]))) # [1, 2, 3, 4], chain combines multiple iterables into a single iterable
+print(list(itertools.combinations("abc", 2))) # [('a', 'b'), ('a', 'c'), ('b', 'c')], combinations generates all possible combinations of a given length from the input iterable
+print(list(itertools.permutations("abc", 2))) # [('a', 'b'), ('a', 'c'), ('b', 'a'), ('b', 'c'), ('c', 'a'), ('c', 'b')], permutations generates all possible permutations of a given length from the input iterable
+print(list(itertools.product("ab", "12"))) # [('a', '1'), ('a', '2'), ('b', '1'), ('b', '2')], product generates the Cartesian product of the input iterables
+for r, c in itertools.product(range(3), range(4)):
+    print(r, c) # prints all pairs of row and column indices for a 3x4 grid
+
+print(math.inf) # positive infinity
+print(-math.inf) # negative infinity
+print(math.gcd(48, 18)) # greatest common divisor of 48 and 18, returns 6
+print(math.lcm(12, 18)) # least common multiple of 12 and 18, returns 36
+print(math.isqrt(16)) # integer square root of 16, returns 4
+print(math.log2(8)) # logarithm base 2 of 8, returns 3.0
+print(math.ceil(2.3)) # ceiling of 2.3, returns 3
+print(math.floor(2.7)) # floor of 2.7, returns 2
+print(divmod(7, 3)) # returns the quotient and remainder of 7 divided by 3 as a tuple, returns (2, 1)
+
+print(string.ascii_lowercase) # 'abcdefghijklmnopqrstuvwxyz', a string containing all lowercase letters
+print(string.ascii_uppercase) # 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', a string containing all uppercase letters
+print(string.digits) # '0123456789', a string containing all digits
