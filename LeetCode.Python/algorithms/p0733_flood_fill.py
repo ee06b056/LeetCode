@@ -23,7 +23,7 @@ class Solution:
                     visited[nextr][nextc] = 1
         return image
     
-    def floodFillBeter(self, image: list[list[int]], sr: int, sc: int, color: int) -> list[list[int]]:
+    def floodFillBetter(self, image: list[list[int]], sr: int, sc: int, color: int) -> list[list[int]]:
         if image[sr][sc] == color:
             return image
         originalcolor = image[sr][sc]
