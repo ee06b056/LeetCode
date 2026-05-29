@@ -23,4 +23,4 @@ class Solution:
                 last_lower[c] = i
             else:
                 first_upper.setdefault(c.lower(), i)
-        return sum(1 for c, i in last_lower.items() if c in first_upper and i < first_upper[c])     
+        return sum(1 for c, i in last_lower.items() if c in first_upper and i < first_upper[c])
