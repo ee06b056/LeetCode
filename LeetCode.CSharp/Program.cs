@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace LeetCode.CSharp;
 
@@ -210,6 +211,27 @@ class Program
         
         // TreeNode
         TreeNode root = new TreeNode(1);
+
+        // Graph representations
+        // Adjacency list
+        Dictionary<int, List<int>> adjList = new();
+        // Adjacency list
+        adjList[1] = [2, 3];
+        // Adjacency matrix
+        int[,] adjMatrix = new int[4, 4];
+        adjMatrix[1, 2] = 1;
+        adjMatrix[1, 3] = 1;
+        // Edge list
+        int[][] edgeList = [[1, 2], [1, 3], [2, 3]];
+        // Convert edge list to adjacency list
+        foreach (var edge in edgeList)
+        {
+            if (!adjList.ContainsKey(edge[0]))
+            {
+                adjList[edge[0]] = new List<int>();
+            }
+            adjList[edge[0]].Add(edge[1]);
+        }
     }
 
     public class TreeNode(int val = 0, Program.TreeNode left = null, Program.TreeNode right = null)

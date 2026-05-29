@@ -487,6 +487,222 @@ while (q.Count > 0) {
 
 ---
 
+## 11. Graphs — a representation, not a type
+
+There is no `Graph<T>` in the BCL. A "graph" in LeetCode is **nodes connected by edges**, and your first job on every graph problem is to pick the right shape for the inputs you're handed.
+
+### Representations
+
+| Representation         | Shape                                    | When                                                          |
+| ---------------------- | ---------------------------------------- | ------------------------------------------------------------- |
+| Adjacency list (array) | `List<int>[]` of length `n`              | Node IDs are `0..n-1` — the LeetCode default                  |
+| Adjacency list (dict)  | `Dictionary<int, List<int>>`             | Node IDs are sparse, negative, strings, or otherwise non-dense |
+| Adjacency matrix       | `bool[,]` or `int[,]` of size `n × n`    | Dense graphs, or small `n` (≤ ~500) and you need O(1) edge lookup |
+| Edge list              | `int[][]` rows of `[u, v]` or `[u, v, w]`| What LeetCode usually *hands* you. Convert before traversing. |
+
+For 95% of problems, **`List<int>[]`** is the right answer.
+
+**Weighted edges:** store tuples — `List<(int neighbor, int weight)>[]`.
+
+### Edge list → adjacency list
+
+```csharp
+// Given: int n, int[][] edges  (each row = [u, v], undirected)
+var adj = new List<int>[n];
+for (int i = 0; i < n; i++) adj[i] = new List<int>();
+foreach (var e in edges) {
+    adj[e[0]].Add(e[1]);
+    adj[e[1]].Add(e[0]);   // both directions for undirected; omit for directed
+}
+```
+
+### Grids are graphs
+
+A 2D grid where each cell connects to its 4 neighbors is an **implicit** graph — no adjacency list needed. The neighbors function:
+
+```csharp
+int[][] dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];   // up, down, left, right
+foreach (var d in dirs) {
+    int nr = r + d[0], nc = c + d[1];
+    if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+    // visit (nr, nc)
+}
+```
+
+This is the single most reused snippet in grid problems — memorize it. For 8-directional, iterate `{-1, 0, 1} × {-1, 0, 1}` and skip `(0, 0)`. See [0542_01Matrix.cs](LeetCode.CSharp/Algorithms/0542_01Matrix.cs).
+
+### BFS template
+
+Shortest path in **unweighted** graphs, level-by-level exploration.
+
+```csharp
+var visited = new bool[n];
+var q = new Queue<int>();
+q.Enqueue(start);
+visited[start] = true;
+while (q.Count > 0) {
+    int node = q.Dequeue();
+    foreach (int nei in adj[node]) {
+        if (visited[nei]) continue;
+        visited[nei] = true;          // mark when ENQUEUING, not when dequeuing
+        q.Enqueue(nei);
+    }
+}
+```
+
+**Critical:** mark visited when you enqueue. Marking on dequeue lets the same node get enqueued many times before processing, blowing up the queue.
+
+**Multi-source BFS** — enqueue *all* sources upfront, then run the same loop. Used for problems like "distance from any rotten orange" (994) or "distance from any 0" (0542).
+
+### DFS template
+
+```csharp
+void Dfs(int node) {
+    if (visited[node]) return;
+    visited[node] = true;
+    foreach (int nei in adj[node]) Dfs(nei);
+}
+```
+
+For grids, you can skip a separate `visited` array by **mutating the grid in place** as you visit (e.g. flip `'1'` to `'0'`). Saves memory and is idiomatic for problems like `200. Number of Islands`.
+
+### Cycle detection — directed graph
+
+A plain `visited` flag confuses "already done" with "currently on my path." Use three states (white / gray / black):
+
+| State | Meaning                              | Reaction          |
+| ----- | ------------------------------------ | ----------------- |
+| 0 (white) | Unvisited                        | Recurse           |
+| 1 (gray)  | On the current DFS path          | Seeing again = **cycle** |
+| 2 (black) | Fully processed, no cycle below  | Skip              |
+
+```csharp
+int[] state = new int[n];
+
+bool HasCycle(int node) {
+    if (state[node] == 1) return true;     // hit a gray ancestor → back edge
+    if (state[node] == 2) return false;    // already cleared
+    state[node] = 1;                        // gray BEFORE recursing
+    foreach (int nei in adj[node]) {
+        if (HasCycle(nei)) return true;
+    }
+    state[node] = 2;                        // black AFTER all descendants done
+    return false;
+}
+```
+
+The gray state is the new idea: it means "an ancestor of where I currently am." A directed cycle exists iff DFS ever follows an edge to a gray node (a "back edge").
+
+### Cycle detection — undirected graph
+
+Pass the parent and ignore the edge you came in on:
+
+```csharp
+bool HasCycleUndirected(int node, int parent) {
+    visited[node] = true;
+    foreach (int nei in adj[node]) {
+        if (nei == parent) continue;
+        if (visited[nei]) return true;
+        if (HasCycleUndirected(nei, node)) return true;
+    }
+    return false;
+}
+```
+
+Or use **Union-Find**: for each edge, if both endpoints are already in the same set, that edge closes a cycle.
+
+### Topological sort
+
+A linear ordering of a DAG such that for every edge `u → v`, `u` comes before `v`. Exists **iff** the graph has no cycle — topo sort and cycle detection are two sides of the same coin.
+
+#### Option A — DFS / post-order reverse
+
+The cycle-detection algorithm with **one extra line**:
+
+```csharp
+int[] state = new int[n];
+var order = new List<int>(n);
+
+bool Dfs(int node) {
+    if (state[node] == 1) return false;    // cycle → no valid order
+    if (state[node] == 2) return true;
+    state[node] = 1;
+    foreach (int nei in adj[node]) {
+        if (!Dfs(nei)) return false;
+    }
+    state[node] = 2;
+    order.Add(node);                        // post-order: add AFTER children
+    return true;
+}
+
+for (int i = 0; i < n; i++) if (!Dfs(i)) return null;
+order.Reverse();                             // post-order = reverse-topo
+return order;
+```
+
+Same shape as your tree post-order in [0145_BinaryTreePostorderTraversal.cs](LeetCode.CSharp/Algorithms/0145_BinaryTreePostorderTraversal.cs), with two additions: the three-state coloring (graphs can cycle, trees can't) and the final `.Reverse()`.
+
+#### Option B — Kahn's algorithm (BFS by in-degree)
+
+"Peel the graph from its sources."
+
+```csharp
+int[] indeg = new int[n];
+foreach (var edges in adj) foreach (int v in edges) indeg[v]++;
+
+var q = new Queue<int>();
+for (int i = 0; i < n; i++) if (indeg[i] == 0) q.Enqueue(i);
+
+var order = new List<int>(n);
+while (q.Count > 0) {
+    int node = q.Dequeue();
+    order.Add(node);
+    foreach (int nei in adj[node]) {
+        if (--indeg[nei] == 0) q.Enqueue(nei);
+    }
+}
+
+return order.Count == n ? order : null;     // < n means cycle
+```
+
+Cycle detection is free: nodes in a cycle never reach in-degree 0, so they're left out of `order`.
+
+#### Which to pick
+
+| | DFS / post-order | Kahn's |
+| --- | --- | --- |
+| Code length | Shorter | Slightly longer (in-degree setup) |
+| Natural output order | Sinks first (reverse needed) | Sources first |
+| Stack-overflow risk on deep DAGs | Yes (use iterative if worried) | No |
+| "All valid orderings?" | Hard | Easy (any in-degree-0 node can go next) |
+| Identifying the cycle's nodes | Easy (the gray ones) | Harder |
+
+For `207. Course Schedule` (just "is there an order?"), either works — DFS is shorter. For `210. Course Schedule II` (return the order), Kahn's reads more naturally.
+
+### Patterns by problem family
+
+| Problem family                                | Approach                                              |
+| --------------------------------------------- | ----------------------------------------------------- |
+| Connected components / "count islands"        | DFS or BFS from every unvisited node, count starts    |
+| Shortest path, unweighted                     | BFS                                                   |
+| Shortest path, weighted (non-negative)        | Dijkstra — `PriorityQueue<int, int>` of `(node, dist)`|
+| Shortest path, with negative edges            | Bellman-Ford (rare in LeetCode)                       |
+| Dependency order / scheduling                 | Topological sort                                      |
+| Cycle exists?                                 | 3-state DFS (directed) or parent-check DFS / Union-Find (undirected) |
+| Connectivity / "are these two nodes linked?"  | Union-Find                                            |
+| Clone / mirror a graph                        | DFS/BFS + `Dictionary<Node, Node>` (original → clone) |
+| Flood fill, regions                           | Grid DFS/BFS, often mutating in place                 |
+
+### Gotchas
+
+- **Mark visited on enqueue, not dequeue** (BFS). Easy to typo, blows up silently with duplicate work.
+- **Directed vs undirected matters.** Cycle detection, edge-list building, and even whether a problem is solvable change based on this — read the problem statement carefully.
+- **The graph may be disconnected.** Always loop `for (i = 0; i < n; i++) if (!visited[i]) ...` to seed from every component.
+- **Recursion depth.** A linear chain of 10,000 nodes overflows the C# stack. For competitive limits, prefer iterative BFS or convert DFS to use an explicit `Stack<int>`.
+- **In grids, the implicit graph is huge** — `rows × cols` nodes, up to 4× as many edges. O(rows × cols) is the floor; don't add `Contains` on a `List<>` inside the loop.
+
+---
+
 ## When to reach for what (LeetCode lens)
 
 | Need                                                  | Reach for                                                     |
@@ -502,12 +718,13 @@ while (q.Count > 0) {
 | Ordered iteration, min/max, range queries             | **`SortedSet<T>` / `SortedDictionary<K,V>`**                  |
 | Problem hands you a `ListNode head`                   | **Manual traversal** — dummy head, two pointers, prev/curr/next |
 | Problem hands you a `TreeNode root`                   | **Recursion** (post-order shape) or **`Queue<TreeNode>`** for BFS |
+| Problem hands you `int n` + `int[][] edges`           | Build `List<int>[]` adjacency list, then BFS / DFS / topo sort |
+| Grid problem (`char[][]` / `int[][]`)                 | Implicit graph — use the 4-direction `dirs` array, mutate in place to mark visited |
 
 ---
 
 ## Up next (when ready)
 
-- **Graphs:** adjacency list as `Dictionary<int, List<int>>` or `List<int>[]`. BFS/DFS templates, visited sets, cycle detection.
 - **Trie:** custom class with `Dictionary<char, TrieNode>` (or `TrieNode[26]` for lowercase) + `isEnd` flag. Prefix search, autocomplete.
 - **Union-Find (DSU):** `int[] parent`, `int[] rank`, with path-compressed `Find` and union-by-rank `Union`. Connectivity, Kruskal's MST, redundant-connection problems.
 - **Performance tools:** `Span<T>` / `ReadOnlySpan<char>` for zero-allocation slicing, `StringBuilder` for repeated concatenation.
