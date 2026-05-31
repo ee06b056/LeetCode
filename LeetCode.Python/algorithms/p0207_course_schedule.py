@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, deque
 
 class Solution:
     def canFinish(self, numCourses: int, prerequisites: list[list[int]]) -> bool:
@@ -19,3 +19,18 @@ class Solution:
             visited_dict[course] = 2
             return True
         return all(dfs(course) for course in range(numCourses))
+    
+    def canFinishKahn(self, numCourses: int, prerequisites: list[list[int]]) -> bool:
+        adj_dict = defaultdict(list)
+        indegree = [0] * numCourses
+        for c, pre in prerequisites:
+            adj_dict[pre].append(c)
+            indegree[c] += 1
+        dq = deque(i for i, c in enumerate(indegree) if c == 0)
+        while dq:
+            c = dq.popleft()
+            for next_c in adj_dict[c]:
+                indegree[next_c] -= 1
+                if indegree[next_c] == 0:
+                    dq.append(next_c)
+        return all(c == 0 for c in indegree)
