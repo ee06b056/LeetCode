@@ -703,6 +703,97 @@ For `207. Course Schedule` (just "is there an order?"), either works — DFS is 
 
 ---
 
+## 12. Binary Search Tree (BST) — ordering on top of `TreeNode`
+
+A BST is a `TreeNode` (section 10) with one extra rule, the **ordering invariant**: for *every* node, all keys in its left subtree are `<` the node and all keys in its right subtree are `>` it. The catch is "every node / whole subtree" — **not** just the immediate children (that's the classic Validate-BST trap).
+
+Two payoffs:
+
+- **search / insert / delete are O(h)** — O(log n) when balanced, **O(n) when degenerate** (feed it sorted keys and it collapses into a linked list).
+- **in-order traversal yields keys in sorted order** — the single fact behind validate, kth-smallest, successor, and range queries.
+
+> Worked examples (Python, both forms): [`p0701_insert_into_a_binary_search_tree.py`](../LeetCode.Python/algorithms/p0701_insert_into_a_binary_search_tree.py).
+
+### Search — O(h)
+
+```csharp
+TreeNode Search(TreeNode root, int target) {
+    var node = root;
+    while (node != null && node.val != target)
+        node = target < node.val ? node.left : node.right;
+    return node;   // null if not found
+}
+```
+
+### Insert — O(h)
+
+The new key always lands at a leaf: walk down comparing, attach where you fall off.
+
+**Recursive ("return the subtree root"):**
+
+```csharp
+TreeNode Insert(TreeNode node, int val) {
+    if (node == null) return new TreeNode(val);      // empty spot → new node
+    if (val < node.val) node.left  = Insert(node.left,  val);
+    else                node.right = Insert(node.right, val);
+    return node;                                     // caller re-wires the child
+}
+```
+
+The `null` base case *returns the new node*, and the caller's `node.left = Insert(...)` links it in — "create the node" and "attach to parent" unify, so no parent pointer is needed. O(h) time, O(h) stack.
+
+**Iterative (look-ahead, O(1) space):**
+
+```csharp
+TreeNode Insert(TreeNode root, int val) {
+    if (root == null) return new TreeNode(val);
+    var p = root;
+    while (true) {
+        if (val < p.val) {
+            if (p.left == null)  { p.left  = new TreeNode(val); return root; }
+            p = p.left;
+        } else {
+            if (p.right == null) { p.right = new TreeNode(val); return root; }
+            p = p.right;
+        }
+    }
+}
+```
+
+The trick: check whether the next child is `null` *before* descending, and attach there — so you stop at the parent of the empty spot without tracking it. Same O(h) time, but **O(1) space** (no call stack), which matters on a degenerate tree where h = n.
+
+### Delete — O(h), the tricky one
+
+Three cases for the node being removed:
+
+1. **Leaf** — detach it.
+2. **One child** — splice that child up into its place.
+3. **Two children** — overwrite the node's value with its **in-order successor** (smallest key in the right subtree: go right once, then left to the bottom), then delete that successor — which has at most one child, so it collapses to case 1 or 2.
+
+### Complexity
+
+| Op                         | Balanced  | Degenerate |
+| -------------------------- | --------- | ---------- |
+| search / insert / delete   | O(log n)  | O(n)       |
+
+Shape depends on insert order. **Self-balancing variants** (AVL, red-black — and `SortedSet<T>` / `SortedDictionary<K,V>` *are* red-black trees under the hood) rotate on insert/delete to keep height O(log n). You rarely hand-roll balancing in an interview — you either reach for the framework's sorted collections or accept O(h) on a problem-provided BST.
+
+### Problems & how the invariant pays off
+
+- **701 Insert / 700 Search** — the templates above.
+- **98 Validate BST** — recurse carrying a `(low, high)` range; *don't* just compare to immediate children (the trap).
+- **230 Kth Smallest** — in-order traversal, stop at the k-th visit.
+- **450 Delete Node** — the three-case delete above.
+- **235 LCA of a BST** — exploit ordering: walk down; the point where the two targets split (one `<` node, one `>` node, or one *is* the node) is the LCA — O(h), no need to recurse into both sides.
+
+### Gotchas
+
+- **Validate ≠ immediate-children check.** A node can be greater than its parent yet still violate an *ancestor's* bound. Carry the `(low, high)` range down.
+- **Degenerate trees.** Sorted input → an O(n) chain. If a problem stresses worst-case or huge n, the iterative insert (O(1) space) sidesteps the stack overflow the recursive one risks.
+- **Duplicates** have no universal convention — disallow, always-one-side, or store a count. LeetCode usually guarantees distinct keys (701 does).
+
+---
+
 ## When to reach for what (LeetCode lens)
 
 | Need                                                  | Reach for                                                     |
