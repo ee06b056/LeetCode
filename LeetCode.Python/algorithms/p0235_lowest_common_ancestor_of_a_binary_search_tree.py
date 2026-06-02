@@ -11,7 +11,7 @@ class TreeNode:
         self.right = None
 
 class Solution:
-    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+    def lowestCommonAncestor(self, root: TreeNode | None, p: TreeNode, q: TreeNode) -> TreeNode | None:
         if root is None:
             return root
         if root.val == p.val or root.val == q.val:
@@ -25,7 +25,7 @@ class Solution:
         else:
             return l_result
         
-    def lowestCommonAncestorIterative(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+    def lowestCommonAncestorIterative(self, root: TreeNode | None, p: TreeNode, q: TreeNode) -> TreeNode | None:
         cur = root
         while cur:
             if cur.val > p.val and cur.val > q.val:

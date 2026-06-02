@@ -27,6 +27,6 @@ class Solution:
         while fast_p is not None and fast_p.next is not None:
             slow_p = slow_p.next
             fast_p = fast_p.next.next
-            if slow_p == fast_p:
+            if slow_p is fast_p:
                 return True
         return False

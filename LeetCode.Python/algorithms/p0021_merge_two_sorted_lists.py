@@ -10,8 +10,8 @@ class ListNode:
 
 class Solution:
     def mergeTwoLists(self, list1: ListNode | None, list2: ListNode | None) -> ListNode | None:
-        dumb_header = ListNode()
-        p = dumb_header
+        dummy_header = ListNode()
+        p = dummy_header
         while list1 is not None and list2 is not None:
             if list1.val <= list2.val:
                 p.next = list1
@@ -24,4 +24,4 @@ class Solution:
             p.next = list1
         else:
             p.next = list2
-        return dumb_header.next
+        return dummy_header.next
