@@ -1,20 +1,22 @@
+from collections import deque
+
 class Solution:
     def isValid(self, s: str) -> bool:
-        stack = []
+        dq = deque()
         for char in s:
             match char:
                 case "{" | "[" | "(":
-                    stack.append(char)
+                    dq.append(char)
                 case "}":
-                    if not stack or stack[-1] != "{":
+                    if not dq or dq[-1] != "{":
                         return False
-                    stack.pop()
+                    dq.pop()
                 case "]":
-                    if not stack or stack[-1] != "[":
+                    if not dq or dq[-1] != "[":
                         return False
-                    stack.pop()
+                    dq.pop()
                 case ")":
-                    if not stack or stack[-1] != "(":
+                    if not dq or dq[-1] != "(":
                         return False
-                    stack.pop()
-        return not stack
+                    dq.pop()
+        return len(dq) == 0

@@ -10,6 +10,6 @@ class Solution:
             j -= 1
         return True
     
-    def isPalindromeConcise(self, s: str) -> bool:
+    def isPalindromeOptimized(self, s: str) -> bool:
         new_s = "".join(c for c in s if c.isalnum()).lower()
         return new_s == new_s[::-1]

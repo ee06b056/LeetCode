@@ -7,17 +7,16 @@ class MyQueue:
     def push(self, x: int) -> None:
         self.instack.append(x)
 
-    def _transfer(self) -> None:
+    def pop(self) -> int:
         if not self.outstack:
             while self.instack:
                 self.outstack.append(self.instack.pop())
-
-    def pop(self) -> int:
-        self._transfer()
         return self.outstack.pop()
 
     def peek(self) -> int:
-        self._transfer()
+        if not self.outstack:
+            while self.instack:
+                self.outstack.append(self.instack.pop())
         return self.outstack[-1]
 
     def empty(self) -> bool:
