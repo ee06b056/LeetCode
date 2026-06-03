@@ -794,6 +794,106 @@ Shape depends on insert order. **Self-balancing variants** (AVL, red-black — a
 
 ---
 
+## 13. Trie (prefix tree) — a tree keyed by character path
+
+A **trie** stores a set of strings as a tree where **each edge is a character** and **each node is the prefix spelled by the path from the root**. Words that share a prefix share the path for that prefix and only branch where they diverge — `app`, `apple`, `apply` all walk the same `a→p→p` spine, then split.
+
+There is no built-in trie in the BCL — you hand-roll a node type. Two things live on every node:
+
+- **children** — the outgoing edges, one per possible next character.
+- **isEnd** — a `bool` marking "a complete word ends *here*," as distinct from "a node merely *exists* here." That flag is the whole reason a trie can tell the word `app` apart from `app` the prefix-of-`apple`.
+
+Payoffs over a `HashSet<string>`:
+
+- **Prefix queries in O(L)** (L = query length) — `startsWith`, autocomplete, "how many words begin with…". A hash set answers *exact* membership but knows nothing about prefixes.
+- **Shared storage** for common prefixes — n words of length L cost O(total characters), not O(n·L) duplicated.
+
+> Worked examples (Python — three variants: recursive, dict-sentinel, class-based): [`p0208_implement_trie_prefix_tree.py`](../LeetCode.Python/algorithms/p0208_implement_trie_prefix_tree.py).
+
+### Node design — two representations
+
+```csharp
+// (a) Dictionary — any alphabet, sparse, the general default
+public class TrieNode {
+    public Dictionary<char, TrieNode> Children = new();
+    public bool IsEnd;
+}
+
+// (b) Fixed array — lowercase a–z only, faster + cache-friendly, more memory
+public class TrieNode {
+    public TrieNode[] Children = new TrieNode[26];   // index = c - 'a'
+    public bool IsEnd;
+}
+```
+
+Pick **(a)** unless the problem pins the alphabet to lowercase letters and you want the constant-factor win — then **(b)**'s `Children[c - 'a']` indexing beats a hash lookup. The trade-off is memory: every node carries 26 slots whether used or not.
+
+**Python contrast.** Python's idiomatic node is `children: dict[str, TrieNode]` (the dictionary form). Two Python-only shortcuts show up:
+
+- **Node *is* a dict** — skip the class entirely; each node is a plain `dict[str, dict]` and a sentinel key (`node['#'] = True`) marks word-end. Compact, but only safe because the sentinel can't collide with a real character, and it mixes value types (child-dicts vs. the flag). The moment you want a real `bool` field, the node has to become a two-slot container — i.e. a class.
+- **Slicing trap** — a recursive `insert(word[1:])` reads clean but **copies the string every level → O(L²)**. Pass an index (`insert(word, i + 1)`) or iterate to keep it O(L).
+
+### The three operations share one walk
+
+`insert` / `search` / `startsWith` all **walk down from the root, one character at a time.** They differ only at the ends:
+
+```csharp
+public void Insert(string word) {
+    var node = root;
+    foreach (var c in word) {
+        if (!node.Children.TryGetValue(c, out var next)) {
+            next = new TrieNode();
+            node.Children[c] = next;
+        }
+        node = next;
+    }
+    node.IsEnd = true;                      // mark the terminal node
+}
+
+public bool Search(string word)       => Find(word) is { IsEnd: true };
+public bool StartsWith(string prefix) => Find(prefix) is not null;
+
+// the shared spine: walk the path, or null if any edge is missing
+private TrieNode? Find(string s) {
+    var node = root;
+    foreach (var c in s) {
+        if (!node.Children.TryGetValue(c, out var next)) return null;
+        node = next;
+    }
+    return node;
+}
+```
+
+The one idea to internalize: **`Search` and `StartsWith` are the same walk and differ only in the final check** — "did the path end on a word" (`IsEnd`) vs. "did the path exist at all" (`!= null`). `Insert` is the same walk but *creates* edges as it goes, so it can't reuse `Find`. (`TryGetValue` is the get-or-miss-in-one-lookup idiom from §8 — the C# analog of Python's `dict.get(c)`.)
+
+The recursive form makes the symmetry even starker: all three are identical except the base case — `search` returns `node.IsEnd`, `startsWith` returns `true`, `insert` sets `node.IsEnd = true`. Iterative is the version to default to (no slicing cost, no recursion-depth ceiling); the empty string falls out for free — the loop just doesn't run, so the operation lands on the root.
+
+### Complexity
+
+| Op (word/prefix length L) | Time | Space (beyond storage) |
+| ------------------------- | ---- | ---------------------- |
+| insert / search / startsWith | O(L) | O(1) iterative · O(L) recursive (call stack) |
+
+Storage is O(total characters across all inserted words), shared on common prefixes. The dictionary node costs memory proportional to actual branching; the `[26]` node costs 26 slots per node regardless.
+
+### Problems & how the structure pays off
+
+- **208 Implement Trie** — the three ops above; the canonical introduction.
+- **211 Add and Search Word** — `search` gains a `.` wildcard. At a `.` you can't pick one edge, so `search` **branches into a DFS** over *all* children. The first problem where the walk stops being a straight line.
+- **212 Word Search II** — build a trie of the target words, then DFS the grid once, pruning a branch the instant its prefix leaves the trie. Turns "search the grid for each of k words" into one shared traversal.
+- **1268 Search Suggestions System** — autocomplete: after each typed character, descend one node and emit the (≤3) lexicographically smallest completions below it.
+- **648 Replace Words** — insert dictionary roots, then for each word walk until you hit an `IsEnd` node — the shortest matching root.
+
+### Gotchas
+
+- **`IsEnd` ≠ "node exists."** Drop the flag and `search` collapses into `startsWith` — every prefix reports as a word. The flag is the entire point.
+- **Python slicing.** `word[1:]` in a recursive trie is O(L) per call → O(L²) total. Pass an index or iterate.
+- **Recursion depth.** A recursive trie recurses to depth L; Python's ~1000 default limit can bite on long words (208 allows length 2000). The iterative form has no ceiling.
+- **Sentinel collisions** (dict-as-node trick). `'#'` only works as the end-marker because the input alphabet excludes it. For an arbitrary alphabet, use a real `bool` field (a class), not a magic key.
+- **Memory.** The `[26]`-array node is fast but wasteful on sparse data (most slots null). Prefer the dictionary node unless the alphabet is small and dense.
+
+---
+
 ## When to reach for what (LeetCode lens)
 
 | Need                                                  | Reach for                                                     |
@@ -811,11 +911,11 @@ Shape depends on insert order. **Self-balancing variants** (AVL, red-black — a
 | Problem hands you a `TreeNode root`                   | **Recursion** (post-order shape) or **`Queue<TreeNode>`** for BFS |
 | Problem hands you `int n` + `int[][] edges`           | Build `List<int>[]` adjacency list, then BFS / DFS / topo sort |
 | Grid problem (`char[][]` / `int[][]`)                 | Implicit graph — use the 4-direction `dirs` array, mutate in place to mark visited |
+| Prefix queries, autocomplete, many words sharing prefixes | **Trie** — `TrieNode` with `Dictionary<char, TrieNode>` (or `TrieNode[26]`) + `IsEnd` |
 
 ---
 
 ## Up next (when ready)
 
-- **Trie:** custom class with `Dictionary<char, TrieNode>` (or `TrieNode[26]` for lowercase) + `isEnd` flag. Prefix search, autocomplete.
 - **Union-Find (DSU):** `int[] parent`, `int[] rank`, with path-compressed `Find` and union-by-rank `Union`. Connectivity, Kruskal's MST, redundant-connection problems.
 - **Performance tools:** `Span<T>` / `ReadOnlySpan<char>` for zero-allocation slicing, `StringBuilder` for repeated concatenation.
