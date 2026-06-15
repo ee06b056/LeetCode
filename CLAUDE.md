@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Personal LeetCode practice. The repo carries two parallel implementations as the user migrates from C# to Python:
 
 - **C#** — `LeetCode.CSharp/`, `LeetCode.CSharp.Tests/`, `LeetCode.sln`. Original track, both projects target `net10.0` with `ImplicitUsings` **disabled** and `Nullable` enabled. `LeetCode.CSharp` is a console project with no NuGet deps; `LeetCode.CSharp.Tests` uses xUnit (`xunit`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, `coverlet.collector`).
-- **Python** — `LeetCode.Python/`. Newer track from 2026-05-23. Python 3.14 via Homebrew, isolated in a venv at `LeetCode.Python/.venv/`. pytest for tests, no other deps.
+- **Python** — `LeetCode.Python/`. Newer track from 2026-05-23. Python 3.14 (Homebrew on macOS, python.org on Windows), isolated in a venv at `LeetCode.Python/.venv/`. The venv is **per-machine and gitignored** — it does not transfer between OSes; recreate it from `requirements.txt` on each machine. pytest for tests, no other deps.
 
 Shared `Notes/` (e.g. `Notes/data-structures.md`) contains language-comparative reference material that grows alongside both tracks.
 
@@ -25,22 +25,39 @@ Run from the repo root:
 
 ### Python
 
-Activate the venv first (per shell, from repo root):
+The venv is **per-machine and gitignored** — create it once on each machine from `requirements.txt`; it does not transfer between Windows and macOS.
+
+**First-time setup** (fresh machine), from inside `LeetCode.Python/`:
 
 ```bash
-source LeetCode.Python/.venv/bin/activate
+# macOS / Linux
+python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 ```
 
-Then from inside `LeetCode.Python/`:
+```powershell
+# Windows (PowerShell)
+python -m venv .venv; .\.venv\Scripts\Activate.ps1; pip install -r requirements.txt
+```
+
+**Activate the venv** (per shell):
+
+- macOS / Linux (from repo root): `source LeetCode.Python/.venv/bin/activate`
+- Windows / PowerShell (from inside `LeetCode.Python/`): `.\.venv\Scripts\Activate.ps1`
+
+**Then** (identical on all platforms), from inside `LeetCode.Python/`:
 
 - Run all tests: `pytest -v`
 - Run a single file: `pytest tests/algorithms/test_p0001_two_sum.py`
 - Filter by name: `pytest -k two_sum`
 - Install a new package: `pip install <name>` then `pip freeze > requirements.txt`
-- Re-create the env on a fresh machine: `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`
 - Run `program.py` (scratch file) ad hoc: `python program.py`
 
 Leave the venv with `deactivate`.
+
+**Windows notes:**
+
+- Use `python` or `py`, **not** `python3` — on Windows `python3` resolves to the Microsoft Store stub, not the real interpreter.
+- If `Activate.ps1` is blocked ("running scripts is disabled on this system"), allow locally-created scripts once: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. Or skip activation entirely and call the venv tools directly: `.\.venv\Scripts\python.exe -m pytest -v`.
 
 ## Conventions
 
