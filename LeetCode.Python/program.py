@@ -651,3 +651,72 @@ print(divmod(7, 3)) # returns the quotient and remainder of 7 divided by 3 as a 
 print(string.ascii_lowercase) # 'abcdefghijklmnopqrstuvwxyz', a string containing all lowercase letters
 print(string.ascii_uppercase) # 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', a string containing all uppercase letters
 print(string.digits) # '0123456789', a string containing all digits
+
+# === 20. Union Find ===
+
+print("-- Union Find --")
+
+class UnionFind:
+    def __init__(self, n: int) -> None:
+        self.parent = list(range(n))
+        self.rank = [0] * n
+        self.size = [1] * n
+        self.count = n
+
+    def find(self, x: int) -> int:
+        while self.parent[x] != x:
+            self.parent[x] = self.parent[self.parent[x]]  # Path halving
+            x = self.parent[x]
+        return x
+    
+    def find(self, x: int) -> int: # Whole path compression
+        root = x
+        while self.parent[root] != root:
+            root = self.parent[root]
+        while self.parent[x] != x:
+            nxt = self.parent[x]
+            self.parent[x] = root
+            x = nxt
+        return root
+    
+    def find(self, x: int) -> int:
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+
+    def find(self, x: int) -> int:
+        while self.parent[x] != x:
+            nxt = self.parent[x]
+            self.parent[x] = self.parent[self.parent[x]]  # Path splitting
+            x = nxt
+        return x
+    
+    def union(self, x: int, y: int) -> None:
+        root_x = self.find(x)
+        root_y = self.find(y)
+
+        if root_x != root_y:
+            if self.rank[root_x] < self.rank[root_y]:
+                self.parent[root_x] = root_y
+            elif self.rank[root_x] > self.rank[root_y]:
+                self.parent[root_y] = root_x
+            else:
+                self.parent[root_x] = root_y
+                self.rank[root_y] += 1
+            self.count -= 1
+
+    def union(self, x: int, y: int) -> None:
+        root_x = self.find(x)
+        root_y = self.find(y)
+        if root_x != root_y:
+            if self.size[root_x] < self.size[root_y]:
+                self.parent[root_x] = root_y
+                self.size[root_y] += self.size[root_x]
+            else:
+                self.parent[root_y] = root_x
+                self.size[root_x] += self.size[root_y]
+            self.count -= 1
+                       
+
+uf = UnionFind(10)
+print(uf.find(5))
