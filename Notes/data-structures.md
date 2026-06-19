@@ -894,6 +894,131 @@ Storage is O(total characters across all inserted words), shared on common prefi
 
 ---
 
+## 14. Union-Find (DSU) — disjoint sets with near-O(1) merge and connectivity
+
+A **union-find** (a.k.a. **disjoint-set union**, DSU) maintains a partition of `{0..n-1}` into disjoint sets and answers two questions fast, as merges stream in:
+
+- **`find(x)`** — which set is `x` in? Returns the set's **representative** (the root of `x`'s tree).
+- **`union(x, y)`** — merge the two sets containing `x` and `y`.
+
+The structure is a **forest**: every element points to a `parent`, and a root (a node whose parent is itself) names the set. "Are `x` and `y` connected?" is just `find(x) == find(y)`. With the two optimizations below, both ops run in **amortized ~O(α(n))** — inverse Ackermann, ≤ 4 for any n you'll ever meet, i.e. effectively constant.
+
+What it's *for*, and what a plain graph can't do as cheaply:
+
+- **Incremental connectivity** — answer "connected?" / "merge" as edges arrive, with no re-traversal. A graph + BFS/DFS recomputes reachability per query; DSU folds each edge in once.
+- **Component count / sizes** in one pass — keep a `count` (decremented per merge) and a `size[]` per root.
+- **Undirected cycle detection** — an edge whose endpoints **already share a root** closes a cycle (684).
+- It is the engine of **Kruskal's MST**.
+
+What it *can't* do: it only **merges** — there is no efficient un-union / split / delete — and it tracks set *membership*, not the actual paths or edges between members.
+
+> Worked example (Python — union-by-size solve; plus a `UnionFind` class cataloguing the four `find` variants in `program.py §20`): [`p0547_number_of_provinces.py`](../LeetCode.Python/algorithms/p0547_number_of_provinces.py).
+
+### Representation — two arrays
+
+```csharp
+int[] parent;   // parent[i] == i  ⟺  i is a root (its own set's representative)
+int[] size;     // size[root] = node count in that tree   (union by size)
+// or:  int[] rank;   // rank[root] = an UPPER BOUND on tree height (union by rank)
+int count;      // number of disjoint sets (optional — handy for "# of components")
+
+void Init(int n) {
+    parent = new int[n];
+    size   = new int[n];
+    for (int i = 0; i < n; i++) { parent[i] = i; size[i] = 1; }
+    count = n;
+}
+```
+
+Each element starts in its own singleton set: `parent[i] = i`, `size = 1`, `count = n`.
+
+### `find` — with path compression
+
+`find` walks parent-pointers to the root. **Path compression** flattens the tree on the way so later `find`s are cheap. Three variants, all correct, all the same amortized bound:
+
+```csharp
+// Path HALVING — single pass, O(1) space — the practical default
+int Find(int x) {
+    while (parent[x] != x) {
+        parent[x] = parent[parent[x]];   // point x at its grandparent
+        x = parent[x];
+    }
+    return x;
+}
+
+// FULL compression (recursive) — flattens completely, but two passes:
+// descend to the root, then re-point every node on the unwind (O(path) stack)
+int FindFull(int x) => parent[x] == x ? x : (parent[x] = FindFull(parent[x]));
+```
+
+The idea to internalize: **full compression fundamentally needs two passes** — you can't point a node at the root until you've *found* the root, and you only find it by walking up. The recursive one-liner *looks* like one pass but pays the second in its call-stack unwind. **Path halving and path splitting are genuinely single-pass, O(1) space, and hit the same α(n)** — so full compression is never required; halving is the one to default to.
+
+### `union` — by size (or by rank)
+
+Always link the **roots**, and hang the **smaller tree under the larger** so depth grows slowly:
+
+```csharp
+void Union(int a, int b) {
+    int ra = Find(a), rb = Find(b);
+    if (ra == rb) return;                            // already together — do nothing
+    if (size[ra] < size[rb]) (ra, rb) = (rb, ra);    // ra = the bigger root
+    parent[rb] = ra;
+    size[ra] += size[rb];
+    count--;                                         // one real merge → one fewer set
+}
+```
+
+Union **by rank** is the classic alternative — identical except it compares `rank` and, only when the two ranks tie, bumps the survivor's rank by 1:
+
+```csharp
+if      (rank[ra] < rank[rb]) parent[ra] = rb;
+else if (rank[ra] > rank[rb]) parent[rb] = ra;
+else  { parent[rb] = ra; rank[ra]++; }
+```
+
+### Rank vs. size — why size is the cleaner default
+
+`rank` is an **upper bound on height**, not the height itself. Without path compression `rank` *equals* the true height; the moment compression runs, `find` shrinks real heights but `union` only ever *increments* rank — so **rank becomes a stale over-estimate**. It's harmless (still a valid bound for the balancing decision, and the α(n) analysis is stated in terms of rank), but it's a quantity you can't fully trust.
+
+`size` has no such drift: path compression re-points nodes but never changes how many are in a tree, so **`size[root]` is always exact** — and it answers "how big is `x`'s group?" for free (1319, largest-component problems). Default to **union by size**; keep rank in your pocket to explain *why* it isn't the true height.
+
+### Complexity
+
+| Optimizations | `find` / `union` amortized |
+| ------------- | -------------------------- |
+| Path compression **+** union by size/rank | **O(α(n))** — effectively O(1) |
+| Only one of the two | O(log n) |
+| Neither | O(n) — the tree degrades to a chain |
+
+Space is O(n) for the array(s). `α(n)` is the inverse Ackermann function (≤ 4 for all practical n).
+
+### Problems & how the structure pays off
+
+- **547 Number of Provinces** — union connected cities, return the component `count`. The canonical introduction (over an adjacency matrix).
+- **323 Number of Connected Components** — same idea over an edge list instead of a matrix.
+- **684 Redundant Connection** — process edges; the **first edge whose endpoints already share a root** is the cycle-closing one to return.
+- **1319 Make Network Connected** — answer is `count − 1` (cables to link the remaining components) provided you have at least that many spare edges; `count` falls straight out of DSU.
+- **990 Satisfiability of Equality Equations** — union all the `==` pairs first, then verify no `!=` pair shares a root.
+- **200 Number of Islands** — grid connectivity; DSU is the alternative to BFS/DFS flood fill (union each land cell with its right/down land neighbors).
+- **Kruskal's MST** — sort edges by weight, union greedily, skip any edge whose endpoints already share a root (it would form a cycle).
+
+### Gotchas
+
+- **Union the roots, not the raw nodes.** `parent[Find(a)] = Find(b)`, never `parent[a] = b` — the latter corrupts the forest.
+- **Decrement `count` only on a real merge** — inside the `ra != rb` check. Bumping it unconditionally (or forgetting it) miscounts components. *(This was the one-line omission in the first `program.py` `union`.)*
+- **No optimization → O(n).** Skip *both* compression and balancing and a chain of unions builds a linked list; `find` goes linear. Use at least one, ideally both.
+- **`rank` isn't the true height** after compression — upper bound only. `size` stays exact; prefer it when you need real counts.
+- **Read `rank`/`size` only at a root.** Non-root entries freeze at whatever they were when the node was last a root — stale everywhere else.
+- **Merges only.** DSU has no efficient split/delete and doesn't remember edges — it answers "same set?", not "what path connects them?".
+- **Indexing.** If the problem labels nodes `1..n`, size the arrays `n + 1` (or map down by one), or you'll index out of range / waste slot 0.
+
+**Python contrast.** `parent = list(range(n))`, `size = [1] * n` — the `list(range(n))` idiom *is* the init loop. Two choices specific to Python:
+
+- **Closure helper vs. a class.** For a one-off solve, a nested `def find(x)` that **closes over `parent`** (no need to pass it) is idiomatic — capture the fixed state, pass only what varies (`x`). For reuse across problems, promote to a `class UnionFind` with `self.parent` / `self.size`; instance attributes dissolve the where-does-the-helper-go and `nonlocal` questions at once.
+- **`nonlocal` for the counter.** If `union` is a *nested* helper that rebinds an `int` component-counter, you need `nonlocal count` (rebinding a captured immutable). Sidestep it by decrementing in the driver loop or returning from a pure helper — but don't reach for the `count = [0]` list-wrap hack; `nonlocal` reads better. Mutating `parent`/`size` (a list) never needs it.
+
+---
+
 ## When to reach for what (LeetCode lens)
 
 | Need                                                  | Reach for                                                     |
@@ -912,10 +1037,10 @@ Storage is O(total characters across all inserted words), shared on common prefi
 | Problem hands you `int n` + `int[][] edges`           | Build `List<int>[]` adjacency list, then BFS / DFS / topo sort |
 | Grid problem (`char[][]` / `int[][]`)                 | Implicit graph — use the 4-direction `dirs` array, mutate in place to mark visited |
 | Prefix queries, autocomplete, many words sharing prefixes | **Trie** — `TrieNode` with `Dictionary<char, TrieNode>` (or `TrieNode[26]`) + `IsEnd` |
+| Dynamic connectivity, merge sets, count components, undirected cycle detection | **Union-Find (DSU)** — `int[] parent` + `int[] size`, path-compressed `Find`, union by size |
 
 ---
 
 ## Up next (when ready)
 
-- **Union-Find (DSU):** `int[] parent`, `int[] rank`, with path-compressed `Find` and union-by-rank `Union`. Connectivity, Kruskal's MST, redundant-connection problems.
 - **Performance tools:** `Span<T>` / `ReadOnlySpan<char>` for zero-allocation slicing, `StringBuilder` for repeated concatenation.
