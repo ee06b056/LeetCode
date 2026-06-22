@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace LeetCode.CSharp.Algorithms;
@@ -45,6 +46,24 @@ public class _0242_ValidAnagram
         {
             if (countArr[c - 97] == 0) return false;
             countArr[c - 97]--;
+        }
+        return true;
+    }
+
+    public bool IsAnagram3(string s, string t)
+    {
+        if (s.Length != t.Length) return false;
+        Span<int> charCount = stackalloc int[26];
+        foreach (char c in s)
+        {
+            int i = c - 'a';
+            charCount[i]++;
+        }
+        foreach (char c in t)
+        {
+            int i = c - 'a';
+            charCount[i]--;
+            if (charCount[i] < 0) return false;
         }
         return true;
     }
