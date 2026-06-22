@@ -1104,6 +1104,80 @@ Span doesn't change *time* complexity — it removes **allocations** (and the GC
 
 ---
 
+## 16. `StringBuilder` — a mutable buffer for building strings
+
+C# strings are **immutable**, so `s += x` in a loop allocates a **brand-new string every iteration**, copying all existing chars — building an n-char string char-by-char is **O(n²)**. `StringBuilder` is a **mutable, growable char buffer**: `Append` writes into it (doubling capacity when full), so building n chars is **O(n) amortized**, with a single `ToString()` at the end to materialize the result once. It's the mutable-buffer counterpart to `Span<T>` (§15) — Span gives you a zero-copy *view*; `StringBuilder` gives you a cheap place to *grow* one.
+
+> Worked examples (C# `StringBuilder` + the Python `list` + `join` equivalent): [`0012_IntegerToRoman.cs`](../LeetCode.CSharp/Algorithms/0012_IntegerToRoman.cs) · [`p0012_integer_to_roman.py`](../LeetCode.Python/algorithms/p0012_integer_to_roman.py).
+
+### Why `+=` in a loop is a trap
+
+```csharp
+string s = "";
+for (int i = 0; i < n; i++) s += i;        // each += allocates a NEW string, copying all prior chars → O(n²)
+
+var sb = new StringBuilder();
+for (int i = 0; i < n; i++) sb.Append(i);  // writes into the buffer → O(n) amortized
+string result = sb.ToString();             // pay the final copy ONCE
+```
+
+The buffer doubles when full (amortized O(1) per append); the single `ToString()` is the only string you materialize.
+
+### Key operations
+
+```csharp
+var sb = new StringBuilder();        // or new StringBuilder(capacity) to preallocate
+sb.Append("abc");                    // string
+sb.Append('x');                      // char
+sb.Append(42);                       // int/double/etc. — formats in place, no intermediate string
+sb.AppendLine("row");                // append + newline
+sb.Insert(0, "pre");                 // insert at index — O(n), shifts the tail
+sb.Remove(0, 3);                     // delete a range — O(n)
+sb[0] = 'A';                         // indexer: random read/write
+sb.Length = 0;                       // reset (or sb.Clear())
+sb.Append("a").Append("b");          // chains — Append returns the builder
+string s = sb.ToString();            // the final string — do this ONCE, at the end
+```
+
+### When to use — and when not to
+
+| Situation | Reach for |
+| --------- | --------- |
+| Build a string **in a loop / incrementally** (unbounded, data-driven appends) | **`StringBuilder`** — the O(n²)→O(n) win |
+| **Fixed, small** number of concatenations (`a + b + c`) | plain `+` — compiles to one `string.Concat`; SB is overkill |
+| **Join a collection** with a separator | `string.Join(sep, items)` — cleaner than a manual SB loop |
+
+Rule of thumb: reach for it the moment the number of appends is **data-driven**, not a handful of known pieces.
+
+### Complexity
+
+| Build an n-char string | Time | Allocations |
+| ---------------------- | ---- | ----------- |
+| `s += x` in a loop | **O(n²)** | O(n) intermediate strings |
+| `StringBuilder` + one `ToString()` | **O(n)** amortized | a few buffer doublings + 1 final string |
+
+`Append` is the amortized-O(1) fast path; `Insert`/`Remove` mid-buffer are O(n) (they shift the tail).
+
+### Problems & where it pays off
+
+- **12 Integer to Roman** — append symbols in a greedy loop (the worked example; short output, so it's the *pattern* practice more than a real perf win).
+- **6 Zigzag Conversion** — an array of `StringBuilder`s, one per row; append each char to its row, then concatenate.
+- **38 Count and Say** — rebuild a string each step; one SB per step.
+- **271 Encode and Decode Strings** — length-prefixed encoding built with SB.
+- **297 Serialize and Deserialize Binary Tree** — SB for the serialize pass.
+- **68 Text Justification** — build each output line.
+
+### Gotchas
+
+- **`ToString()` once.** Calling it inside the loop defeats the purpose (re-materializes the whole string each time). Build fully, then `ToString()` at the end.
+- **Preallocate when you can.** `new StringBuilder(capacity)` skips regrowth if you know the rough final size — a constant-factor win.
+- **`string.Join` beats a hand-rolled SB loop** for "concatenate these N with a separator" — don't reinvent the separator handling.
+- **Not for a few concatenations.** `a + "-" + b` is clearer and no slower than SB; the compiler already does the right thing.
+
+**Python contrast.** Python strings are **also immutable**, so `s += x` in a loop is *also* O(n²) in general (CPython has a fragile in-place optimization for the refcount-1 `s += x` form — don't rely on it). The idiomatic equivalent is **accumulate pieces in a `list`, then `"".join(list)`** — O(n) total, one allocation at the join. So **C# `StringBuilder` ↔ Python `list` + `"".join(...)`**; for streaming/file-like building, `io.StringIO`. The 12 solves show the pairing directly: an SB loop in C#, a `list`-append + `"".join` in Python (named `sb` there to make the mapping explicit).
+
+---
+
 ## When to reach for what (LeetCode lens)
 
 | Need                                                  | Reach for                                                     |
@@ -1124,9 +1198,12 @@ Span doesn't change *time* complexity — it removes **allocations** (and the GC
 | Prefix queries, autocomplete, many words sharing prefixes | **Trie** — `TrieNode` with `Dictionary<char, TrieNode>` (or `TrieNode[26]`) + `IsEnd` |
 | Dynamic connectivity, merge sets, count components, undirected cycle detection | **Union-Find (DSU)** — `int[] parent` + `int[] size`, path-compressed `Find`, union by size |
 | Slice/parse part of an array or string without allocating; small fixed scratch buffer | **`Span<T>` / `ReadOnlySpan<char>`** (zero-copy window) · **`stackalloc int[26]`** (zero-heap buffer) |
+| Build a string incrementally / in a loop | **`StringBuilder`** (C#) · **`list` + `"".join`** (Python) — O(n) vs the O(n²) of `+=` |
 
 ---
 
 ## Up next (when ready)
 
-- **`StringBuilder`** — O(1) amortized append vs O(n) per `string +`; the mutable-buffer counterpart to `Span<T>` for *building* strings. (The last performance-tools item; the data-structure walk itself is now complete — §1–15.)
+The data-structure walk is **complete — §1–16**: every collection and primitive that recurs in LeetCode, each with a solve set and a notes section. Nothing queued.
+
+If the walk is ever extended, the natural next-level candidates are **Fenwick tree / BIT** and **segment tree** (range-sum / range-update queries), and a documented **monotonic stack/deque** pattern page (the idea behind 1696 Jump Game VI).
