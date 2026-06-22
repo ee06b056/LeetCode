@@ -10,18 +10,22 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 8 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 11 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
 
 ## 1. Prefix Sum
 *Recognize:* many range-sum queries, or "count subarrays whose sum = K." Precompute cumulative sums; range = `P[j] - P[i-1]`. For "subarray sum = K / equal 0s and 1s," pair a running sum with a hash map of seen sums.
-- [ ] ⬜ **303** Range Sum Query - Immutable
-- [ ] ⬜ **525** Contiguous Array
-- [ ] ⬜ **560** Subarray Sum Equals K
+- [x] ✅ **303** Range Sum Query - Immutable
+- [x] ✅ **525** Contiguous Array
+- [x] ✅ **560** Subarray Sum Equals K
 
-**Notes:** _(fill as you learn — recognition cue, template, gotchas)_
+**Notes:** Two forms.
+- **(a) Static array** — precompute cumulative sums with a **sentinel** (`prefix[0]=0`, length n+1); range `(l..r) = prefix[r+1] - prefix[l]`. `itertools.accumulate(nums, initial=0)` is the idiomatic builder; the sentinel kills the `l==0` special case (303).
+- **(b) Running sum + hash map** — sweep a running sum `s`; the pivot is **`subarray (i..j) sum = k ⟺ prefix[i] = s - k`**, so look up `s - k` in a map of prefixes seen so far. *Payload depends on the question:* `sum → count` when **counting** subarrays (560: `count += seen[s-k]`, then `seen[s] += 1`; seed `{0:1}`); `sum → first index` when finding the **longest** (525: store first occurrence only, `len = i - first[s]`; seed `{0:-1}`; transform `0→-1` so "equal 0s/1s" becomes "sum 0").
+- **Gotchas:** seed the base-case key or you miss subarrays starting at index 0; **never reset/decrement a seen-count** — repeats are *distinct* subarrays, not double-counts (the `seen[target]=0` under-counting bug); for "longest," store **first** occurrence only (don't overwrite).
+- **Not DP** — it's complement-lookup (Two Sum over running sums), no choice/optimization. Prefix sums are a *tool* DP uses, not a DP pattern.
 
 ---
 
