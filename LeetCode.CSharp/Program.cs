@@ -232,6 +232,21 @@ class Program
             }
             adjList[edge[0]].Add(edge[1]);
         }
+
+        // Span<T>
+        "hello, Bo".AsSpan().Slice(1, 3);
+        Span<int> numSpan = stackalloc int[10];
+        numSpan[0] = 1;
+
+        string s = "hello, Bo";
+        s.Substring(1, 3);
+        var sSpan = s.AsSpan(1, 3);
+
+        int[] arr = [0, 1, 2, 3, 4];
+        int[] subArr = arr[1..4];
+        var arrSpan= arr.AsSpan(1);
+        var subArrSpan = arr[1..3];
+        
     }
 
     public class TreeNode(int val = 0, Program.TreeNode left = null, Program.TreeNode right = null)
