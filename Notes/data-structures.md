@@ -1019,6 +1019,91 @@ Space is O(n) for the array(s). `α(n)` is the inverse Ackermann function (≤ 4
 
 ---
 
+## 15. `Span<T>` / `stackalloc` — zero-allocation windows over memory
+
+`Span<T>` is **not a collection** — it's a **`(pointer, length)` view** over contiguous memory you already have. It owns nothing and copies nothing; slicing it is O(1) (a new offset + length). It's the .NET tool for **touching part of an array or string without allocating a copy**.
+
+It can wrap, uniformly:
+
+- a managed array — `arr.AsSpan()`
+- a slice of a string — `s.AsSpan(start, len)` → `ReadOnlySpan<char>`
+- stack memory — `stackalloc int[26]`
+- unmanaged / native memory
+
+> Worked examples (C#): zero-alloc version parsing via `ReadOnlySpan<char>` — [`0165_CompareVersionNumbers.cs`](../LeetCode.CSharp/Algorithms/0165_CompareVersionNumbers.cs); a `stackalloc int[26]` frequency map — [`0242_ValidAnagram.cs`](../LeetCode.CSharp/Algorithms/0242_ValidAnagram.cs) (`IsAnagram3`).
+
+### The variants
+
+| Type | What it is | Typical source |
+| ---- | ---------- | -------------- |
+| `Span<T>` | read/write window | array, `stackalloc` |
+| `ReadOnlySpan<T>` | read-only window | anything immutable |
+| `ReadOnlySpan<char>` | the string-slicing workhorse | a `string` (implicit conversion) |
+| `Memory<T>` / `ReadOnlyMemory<T>` | heap-storable cousin | when a span can't (fields, `async`) |
+
+`string` converts to `ReadOnlySpan<char>` implicitly and for free — strings are immutable, so you only ever get the read-only span.
+
+### Key operations
+
+```csharp
+ReadOnlySpan<char> s = "192.168.0.1";   // implicit, zero-copy
+var head = s[..3];                       // "192" — O(1) slice, no allocation
+var tail = s[(s.IndexOf('.') + 1)..];    // everything after the first dot
+int n = int.Parse(s[..3]);               // parse straight from the window
+
+Span<int> freq = stackalloc int[26];     // 26 ints on the STACK, zero heap
+freq['c' - 'a']++;                       // index like an array
+arr.AsSpan(1, 3).Reverse();              // in-place op on a subarray
+```
+
+Range syntax (`x[a..b]`, `x[a..]`, `x[..b]`) works on spans, arrays, and strings — but on an **array or string**, `arr[1..4]` *allocates a copy*, whereas on a **span**, `span[1..4]` is a free re-window. That asymmetry is the whole point: **take a span first, then slice.**
+
+### The one rule that constrains everything — `ref struct`
+
+`Span<T>` is a **`ref struct`**: it must live on the stack. The compiler forbids anything that could let it escape to the heap. It **cannot**:
+
+- be a **field of a class** (only of another `ref struct`);
+- be **boxed**, used as a **generic type argument**, or **captured by a lambda**;
+- **survive an `await` or `yield`** — the most common real-world trip-up.
+
+*Why:* a span can point at stack memory (`stackalloc`) or mid-object; letting it outlive its stack frame, or cross an async resume, would dangle. If you need to store a slice on the heap or hold it across `await`, use **`Memory<T>`** (heap-safe) and call **`.Span`** only at the point of use.
+
+The safe everyday pattern: **create, use, discard within one stack frame** — slice it, parse/scan it, let it die. Both worked examples do exactly this; the span never escapes.
+
+### `stackalloc` — the zero-heap fixed buffer
+
+`Span<int> freq = stackalloc int[26];` carves a small buffer out of the **current stack frame** — no GC allocation, reclaimed when the method returns. Ideal for small fixed-size scratch (a 26-letter histogram, a 128-entry ASCII table). **Keep it small and never `stackalloc` in a loop** — the stack is ~1 MB and isn't freed until the method exits, so a large or repeated `stackalloc` risks a stack overflow. Rule of thumb: only for small, compile-time-bounded sizes.
+
+### Complexity / allocation
+
+| Approach | Slice / parse a substring | Heap allocation |
+| -------- | ------------------------- | --------------- |
+| `Substring` + `int.Parse(string)` | O(len) copy each time | **yes** — one string per slice |
+| `ReadOnlySpan<char>` + `int.Parse(span)` | O(len), **no copy** | **none** |
+| `new int[26]` frequency map | — | **yes** (heap array) |
+| `stackalloc int[26]` | — | **none** (stack) |
+
+Span doesn't change *time* complexity — it removes **allocations** (and the GC pressure they create). On a hot loop slicing thousands of times, that's the difference between churning the GC and not.
+
+### Problems & where it pays off
+
+- **165 Compare Version Numbers** — slice each dot-separated revision as `ReadOnlySpan<char>` and `int.Parse` it; zero `Substring` allocations.
+- **242 Valid Anagram** — `stackalloc int[26]` frequency map; zero-heap counting (the third variant, vs `Dictionary` and a heap `int[26]`).
+- **8 String to Integer (atoi), 71 Simplify Path** — span-based scanning / parsing without building intermediate strings.
+- **Sliding window over a string** — carry a `ReadOnlySpan<char>` window instead of repeated `Substring`.
+
+### Gotchas
+
+- **`ref struct` rules** (above) — no class fields, no `async`/lambda capture, no boxing. Reach for `Memory<T>` when you hit them.
+- **`stackalloc` discipline** — small and compile-time-bounded only; never in a loop. Big / looped `stackalloc` → stack overflow.
+- **Ranges allocate on arrays/strings, not on spans.** `array[1..4]` copies; `array.AsSpan()[1..4]` doesn't. Span *first*, then slice.
+- **A span is a view, not a guard.** A span over an array can be invalidated if the backing store is resized/replaced — don't hold one past changes to what it points at.
+- **Alphabet assumptions.** A `stackalloc int[26]` histogram hard-codes `a–z` (`c - 'a'`); fine when the problem pins the alphabet, but a `Dictionary<char,int>` is the alphabet-agnostic fallback (the trade-off across 242's three variants).
+
+**Python contrast.** Python slicing **copies** — `s[1:4]` and `lst[1:4]` both allocate. The zero-copy analogs are narrow: `memoryview` (bytes/buffers only) and NumPy array views. There's no general, type-safe "window over any list" the way `Span<T>` is the everyday default in C#. So these idioms have **no clean Python equivalent** — in Python you either take the copy or **thread indices** (`s`, `i`, `j`) to avoid it, which is the same move you already use to dodge the `word[1:]` O(L²) trap in the Trie notes (§13).
+
+---
+
 ## When to reach for what (LeetCode lens)
 
 | Need                                                  | Reach for                                                     |
@@ -1038,9 +1123,10 @@ Space is O(n) for the array(s). `α(n)` is the inverse Ackermann function (≤ 4
 | Grid problem (`char[][]` / `int[][]`)                 | Implicit graph — use the 4-direction `dirs` array, mutate in place to mark visited |
 | Prefix queries, autocomplete, many words sharing prefixes | **Trie** — `TrieNode` with `Dictionary<char, TrieNode>` (or `TrieNode[26]`) + `IsEnd` |
 | Dynamic connectivity, merge sets, count components, undirected cycle detection | **Union-Find (DSU)** — `int[] parent` + `int[] size`, path-compressed `Find`, union by size |
+| Slice/parse part of an array or string without allocating; small fixed scratch buffer | **`Span<T>` / `ReadOnlySpan<char>`** (zero-copy window) · **`stackalloc int[26]`** (zero-heap buffer) |
 
 ---
 
 ## Up next (when ready)
 
-- **Performance tools:** `Span<T>` / `ReadOnlySpan<char>` for zero-allocation slicing, `StringBuilder` for repeated concatenation.
+- **`StringBuilder`** — O(1) amortized append vs O(n) per `string +`; the mutable-buffer counterpart to `Span<T>` for *building* strings. (The last performance-tools item; the data-structure walk itself is now complete — §1–15.)
