@@ -1,0 +1,173 @@
+# LeetCode Patterns — recognition + practice tracker
+
+A pattern-first pass before the DP deep-dive, following AlgoMaster's
+[15 LeetCode Patterns](https://blog.algomaster.io/p/15-leetcode-patterns). The thesis (patterns > raw volume)
+matches how the data-structure walk (`data-structures.md` §1–16) was run.
+
+**Approach:** learn each pattern in order, then solve its problems — **skip any already done in Python**, write the rest.
+Fill the per-pattern **Notes** (recognition cue → template → gotchas) as you go, the same solve-plus-notes rhythm as the
+data-structure walk.
+
+**Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
+
+**Progress: 8 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
+
+---
+
+## 1. Prefix Sum
+*Recognize:* many range-sum queries, or "count subarrays whose sum = K." Precompute cumulative sums; range = `P[j] - P[i-1]`. For "subarray sum = K / equal 0s and 1s," pair a running sum with a hash map of seen sums.
+- [ ] ⬜ **303** Range Sum Query - Immutable
+- [ ] ⬜ **525** Contiguous Array
+- [ ] ⬜ **560** Subarray Sum Equals K
+
+**Notes:** _(fill as you learn — recognition cue, template, gotchas)_
+
+---
+
+## 2. Two Pointers
+*Recognize:* sorted array, find a pair/triple meeting a condition; or partition in place. Pointers from both ends, move based on comparison.
+- [ ] ⬜ **167** Two Sum II - Input Array Is Sorted
+- [ ] ⬜ **15** 3Sum
+- [ ] ⬜ **11** Container With Most Water
+
+**Notes:** _(fill as you go)_
+
+---
+
+## 3. Sliding Window
+*Recognize:* longest/shortest/contains subarray or substring meeting a constraint. Grow the right edge; shrink the left when the window violates the constraint. (Distinct from the window-**DP** of 1696.)
+- [ ] ⬜ **643** Maximum Average Subarray I
+- [ ] ⬜ **3** Longest Substring Without Repeating Characters
+- [ ] ⬜ **76** Minimum Window Substring
+
+**Notes:** _(fill as you go)_
+
+---
+
+## 4. Fast & Slow Pointers 🟦
+*Recognize:* cycle detection / find a meeting point in a linked list or implicit functional graph. Slow +1, fast +2; they meet iff a cycle exists.
+- [x] ✅ **141** Linked List Cycle — *done (set + Floyd's)*
+- [ ] ⬜ **202** Happy Number
+- [ ] ⬜ **287** Find the Duplicate Number — *(on the identity-algorithms TODO list)*
+
+**Notes:** _(fill as you go)_
+
+---
+
+## 5. LinkedList In-place Reversal 🟦
+*Recognize:* reverse a list or a sub-segment with O(1) space. Thread `prev / curr / next`; for sub-ranges, anchor a dummy head before the segment.
+- [x] ✅ **206** Reverse Linked List — *done (iterative + recursive)*
+- [ ] ⬜ **92** Reverse Linked List II
+- [ ] ⬜ **24** Swap Nodes in Pairs
+
+**Notes:** _(fill as you go)_
+
+---
+
+## 6. Monotonic Stack
+*Recognize:* "next/previous greater or smaller element," or histogram-style spans. Keep a stack in monotonic order; pop while the incoming element breaks the order, resolving the popped element's answer.
+- [ ] ⬜ **496** Next Greater Element I
+- [ ] ⬜ **739** Daily Temperatures
+- [ ] ⬜ **84** Largest Rectangle in Histogram
+
+**Notes:** _(fill as you go — relate to the monotonic-**deque** of 1696)_
+
+---
+
+## 7. Top-K Elements
+*Recognize:* k largest/smallest/most-frequent. Min-heap of size k (largest), max-heap (smallest), or bucket sort by frequency. Heap = O(n log k).
+- [ ] ⬜ **215** Kth Largest Element in an Array
+- [ ] ⬜ **347** Top K Frequent Elements
+- [ ] ⬜ **373** Find K Pairs with Smallest Sums
+
+**Notes:** _(fill as you go — `heapq`, tuple priorities, negate for max-heap)_
+
+---
+
+## 8. Overlapping Intervals
+*Recognize:* merge/insert/count overlaps. Sort by start; merge when `end ≥ next.start`. For "remove fewest," sort by end and greedily keep.
+- [ ] ⬜ **56** Merge Intervals
+- [ ] ⬜ **57** Insert Interval
+- [ ] ⬜ **435** Non-Overlapping Intervals
+
+**Notes:** _(fill as you go)_
+
+---
+
+## 9. Modified Binary Search
+*Recognize:* sorted-but-rotated, or a 2D sorted matrix, or "find boundary/min." Decide which half is sorted, then narrow.
+- [ ] ⬜ **33** Search in Rotated Sorted Array
+- [ ] ⬜ **153** Find Minimum in Rotated Sorted Array
+- [ ] ⬜ **240** Search a 2D Matrix II
+
+**Notes:** _(fill as you go — builds on the §iterative-binary-search template, 704)_
+
+---
+
+## 10. Binary Tree Traversal 🟦
+*Recognize:* the traversal order encodes the problem — PreOrder (root-first, paths), InOrder (sorted, BST), PostOrder (children-first, aggregates).
+- [ ] ⬜ **257** Binary Tree Paths *(PreOrder)*
+- [ ] ⬜ **230** Kth Smallest Element in a BST *(InOrder)*
+- [ ] ⬜ **124** Binary Tree Maximum Path Sum *(PostOrder)*
+
+**Notes:** _(fill as you go — you own trees from §10/§12; 124 is the tricky one)_
+
+---
+
+## 11. Depth-First Search 🟦
+*Recognize:* explore all paths/branches; connectivity; topological order. Recursion or explicit stack.
+- [x] ✅ **133** Clone Graph — *done*
+- [ ] ⬜ **113** Path Sum II
+- [x] ✅ **210** Course Schedule II — *done (DFS + Kahn's)*
+
+**Notes:** _(fill as you go)_
+
+---
+
+## 12. Breadth-First Search 🟦
+*Recognize:* shortest path in an unweighted graph; level-order. Queue, process level by level.
+- [ ] ⬜ **102** Binary Tree Level Order Traversal
+- [x] ✅ **994** Rotting Oranges — *done (multi-source BFS)*
+- [ ] ⬜ **127** Word Ladder
+
+**Notes:** _(fill as you go)_
+
+---
+
+## 13. Matrix Traversal 🟦
+*Recognize:* grid as an implicit graph; flood-fill / region problems. 4-dir `dirs`, mark visited in place.
+- [x] ✅ **733** Flood Fill — *done*
+- [x] ✅ **200** Number of Islands — *done*
+- [ ] ⬜ **130** Surrounded Regions
+
+**Notes:** _(fill as you go — 130's trick: seed from the border)_
+
+---
+
+## 14. Backtracking
+*Recognize:* enumerate all permutations/combinations/subsets/placements under constraints. Choose → recurse → un-choose.
+- [ ] ⬜ **46** Permutations
+- [ ] ⬜ **78** Subsets
+- [ ] ⬜ **51** N-Queens
+
+**Notes:** _(fill as you go — the bridge into DP; 212 used grid backtracking)_
+
+---
+
+## 15. Dynamic Programming *(the deep-dive — separate `dynamic-programming.md` to follow)*
+*Recognize:* overlapping subproblems + optimal substructure. Sub-families: Fibonacci/1-D, 0/1 knapsack, LCS, LIS, subset-sum.
+- [x] ✅ **70** Climbing Stairs — *done (O(1) Fibonacci)*
+- [ ] ⬜ **198** House Robber
+- [ ] ⬜ **322** Coin Change
+- [ ] ⬜ **1143** Longest Common Subsequence
+- [ ] ⬜ **300** Longest Increasing Subsequence
+- [ ] ⬜ **416** Partition Equal Subset Sum
+
+**Notes:** _(deferred to the DP ladder — `dynamic-programming.md`)_
+
+---
+
+## Not in this article (already done, complementary)
+Your recent **Trie** (208/211/212) and **Union-Find** (547/684/323/1319) work isn't among these 15 patterns —
+they're additional coverage. Likewise 49, 121, 125, 217, 235, 278, 383, 409, 704 and others sit outside the article's picks.
