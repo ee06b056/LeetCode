@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 11 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 14 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -31,11 +31,15 @@ data-structure walk.
 
 ## 2. Two Pointers
 *Recognize:* sorted array, find a pair/triple meeting a condition; or partition in place. Pointers from both ends, move based on comparison.
-- [ ] ⬜ **167** Two Sum II - Input Array Is Sorted
-- [ ] ⬜ **15** 3Sum
-- [ ] ⬜ **11** Container With Most Water
+- [x] ✅ **167** Two Sum II - Input Array Is Sorted
+- [x] ✅ **15** 3Sum
+- [x] ✅ **11** Container With Most Water
 
-**Notes:** _(fill as you go)_
+**Notes:** Sorted array, pointers at both ends, move inward by comparison — sortedness lets each step discard a whole set of candidates in O(1). Three flavors:
+- **Converge to a target (167):** `l=0, r=n-1`; `sum < target → l += 1`, `sum > target → r -= 1`. (1-indexed return here.)
+- **Fix one + converge + dedup (15, 3Sum):** sort; for each `i`, two-pointer `(i+1, n-1)` for pairs summing to `-nums[i]`. **Decouple progress from dedup** — `elif/else` are *pure single moves* (`l += 1`/`r -= 1`); dedup is a *separate additive step* that fires **only** after a match (skip equal `l`/`r`) and at the outer `i` (`if i>0 and nums[i]==nums[i-1]: continue`). Use `for i in range(...)`, **not** `while` — `continue` in a `while` skips the bottom `i += 1` → infinite loop. Optional prune: `if nums[i] > 0: break`.
+- **Greedy, move the limiter (11, Container):** maximize `min(h[l], h[r])·(r-l)`; move the pointer at the **shorter** line. *Why safe:* the shorter line caps the height, and its widest partner is the current opposite end, so `(l,r)` is the best container it can ever be in — record it, then discard it. Moving the *taller* could skip the optimum (its potential isn't exhausted). On a tie, either side is safe.
+- **Gotchas:** every branch must **advance a pointer** (guarantees termination); dedup is never a substitute for the move; `while`-loop `continue` trap.
 
 ---
 
