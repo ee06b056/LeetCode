@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 14 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 17 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -45,11 +45,16 @@ data-structure walk.
 
 ## 3. Sliding Window
 *Recognize:* longest/shortest/contains subarray or substring meeting a constraint. Grow the right edge; shrink the left when the window violates the constraint. (Distinct from the window-**DP** of 1696.)
-- [ ] ⬜ **643** Maximum Average Subarray I
-- [ ] ⬜ **3** Longest Substring Without Repeating Characters
-- [ ] ⬜ **76** Minimum Window Substring
+- [x] ✅ **643** Maximum Average Subarray I
+- [x] ✅ **3** Longest Substring Without Repeating Characters
+- [x] ✅ **76** Minimum Window Substring
 
-**Notes:** _(fill as you go)_
+**Notes:** Keep a window `[left, right]` and update an **incremental aggregate** (sum, char-count map) as it moves — never recompute. Two shapes:
+- **Fixed-size (643):** window of exactly `k`. Seed the first window, then slide: `window_sum += nums[right] - nums[left]`. O(n·k) → O(n).
+- **Variable, maximize (3):** expand `right`; when a constraint breaks (a repeat), shrink `left` to restore it; record max *while valid*. Index-jump variant: map `char → last index`, `left = max(left, last[c] + 1)` (the `max` stops `left` rewinding past an earlier duplicate).
+- **Variable, minimize with coverage (76):** expand until the window **covers** `t`, then shrink *while still covering*, recording the min. `need = Counter(t)` (multiplicity!), `required = len(need)`, `formed` counter; `formed += 1` only when `have[c] == need[c]` (cross **up**, `==`), `formed -= 1` only when `have[c] < need[c]` (cross **down**, `<`). `formed == required` is the O(1) validity check.
+- **The inversion:** longest-valid (3) shrinks to *escape* invalidity; shortest-covering (76) shrinks *while still valid* to tighten. Same `left`-shrink, opposite trigger.
+- **Gotchas:** 643 seed the first window then slide; 3 `max(left, last+1)` so `left` never rewinds; 76 use `Counter` not a set (dups in `t`), and update `formed` on **both** add and remove with `==`/`<` (not `>=`/`<=`).
 
 ---
 
