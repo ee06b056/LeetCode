@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 17 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 19 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -61,10 +61,14 @@ data-structure walk.
 ## 4. Fast & Slow Pointers 🟦
 *Recognize:* cycle detection / find a meeting point in a linked list or implicit functional graph. Slow +1, fast +2; they meet iff a cycle exists.
 - [x] ✅ **141** Linked List Cycle — *done (set + Floyd's)*
-- [ ] ⬜ **202** Happy Number
-- [ ] ⬜ **287** Find the Duplicate Number — *(on the identity-algorithms TODO list)*
+- [x] ✅ **202** Happy Number
+- [x] ✅ **287** Find the Duplicate Number
 
-**Notes:** _(fill as you go)_
+**Notes:** Tortoise (+1) and hare (+2); if there's a cycle, the hare laps the tortoise and they meet inside it. **The big leap: the "linked list" can be implicit** — any `next = f(current)` defines one.
+- **141** — literal list, `next = node.next`. Meet ⇒ cycle.
+- **202** — functional graph, `next = sum of digit squares`. `1` is a fixed point (`1→1`), so happy numbers meet at `1`, unhappy ones in a non-`1` cycle → `return slow == 1`. O(1) space (vs the seen-set variant).
+- **287** — array as list, `next = nums[i]`. `[1,n]` values + `n+1` of them ⇒ a cycle exists (pigeonhole), and its **entrance is the duplicate**; value range excludes `0`, so index `0` has in-degree 0 (a clean tail-start). **Full two-phase Floyd's:** ① find the meeting point (`slow = nums[slow]`, `fast = nums[nums[fast]]`); ② reset `slow = 0`, advance **both by one** → they meet at the entrance. Phase 2 works because `dist(start→entrance) = dist(meet→entrance)`.
+- **Gotchas:** the meeting point is **not** the entrance — phase 2 is required (287); emulate do-while (unroll the first step) so `slow == fast == 0` doesn't exit immediately; the entrance proof needs the start *outside* the loop.
 
 ---
 
