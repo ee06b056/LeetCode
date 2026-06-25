@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 19 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 22 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -74,11 +74,15 @@ data-structure walk.
 
 ## 5. LinkedList In-place Reversal 🟦
 *Recognize:* reverse a list or a sub-segment with O(1) space. Thread `prev / curr / next`; for sub-ranges, anchor a dummy head before the segment.
-- [x] ✅ **206** Reverse Linked List — *done (iterative + recursive)*
-- [ ] ⬜ **92** Reverse Linked List II
-- [ ] ⬜ **24** Swap Nodes in Pairs
+- [x] ✅ **206** Reverse Linked List — *iterative + recursive*
+- [x] ✅ **92** Reverse Linked List II
+- [x] ✅ **24** Swap Nodes in Pairs
 
-**Notes:** _(fill as you go)_
+**Notes:** The base move (O(1) space): `nxt = curr.next; curr.next = prev; prev = curr; curr = nxt`. Canonical full reversal: `prev, curr = None, head` → loop → `return prev` (empty/single fall out for free, no guard needed).
+- **206** — reverse the whole list.
+- **92 (segment):** **dummy head** (left can be 1), walk `prev` to node `left-1`, reverse `right-left+1` nodes, then **reconnect both boundaries** (`prev.next` → new segment head; old segment head → node after `right`). The bugs live in the reconnection and the walk — an off-by-`(left-1)` if the walk loop misfires.
+- **24 (fixed 2-chunks):** dummy head; per pair `(p1, p2)`: `cp.next = p2; p2.next = p1; p1.next = next_p; cp = p1`. Loop while `cp.next` and `cp.next.next` exist. Recursive form: swap first two, `head.next = recurse(rest)`.
+- **Gotchas:** **save `next` before overwriting** any `.next` (or you lose the tail); reach for a **dummy head** whenever the head can change or you need a stable "node before the action"; a true recursive variant must call **itself**, not delegate to the iterative one.
 
 ---
 
