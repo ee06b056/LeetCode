@@ -22,6 +22,18 @@ class Solution:
         p2.next = p1
         return p2
     
+    def reverseList(self, head: ListNode | None) -> ListNode | None:
+        if head is None or head.next is None:
+            return head
+        p1 = head
+        p2 = head.next
+        p1.next = None
+        while p2:
+            temp_p = p2.next
+            p2.next = p1
+            p2, p1 = temp_p, p2
+        return p1
+
     def reverseListRecursive(self, head: ListNode | None) -> ListNode | None:
         if head is None or head.next is None:
             return head
