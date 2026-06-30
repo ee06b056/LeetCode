@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 22 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 25 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -88,11 +88,16 @@ data-structure walk.
 
 ## 6. Monotonic Stack
 *Recognize:* "next/previous greater or smaller element," or histogram-style spans. Keep a stack in monotonic order; pop while the incoming element breaks the order, resolving the popped element's answer.
-- [ ] ⬜ **496** Next Greater Element I
-- [ ] ⬜ **739** Daily Temperatures
-- [ ] ⬜ **84** Largest Rectangle in Histogram
+- [x] ✅ **496** Next Greater Element I
+- [x] ✅ **739** Daily Temperatures
+- [x] ✅ **84** Largest Rectangle in Histogram
 
-**Notes:** _(fill as you go — relate to the monotonic-**deque** of 1696)_
+**Notes:** Keep the stack monotonic; when a new element **breaks the order, pop — and the pop resolves the popped element's answer**. Each element pushed/popped once → O(n). **Two decisions:** increasing-vs-decreasing (*next greater* → decreasing, pop when `cur > top`; *next smaller / rectangle* → increasing, pop when `cur < top`) and values-vs-indices (store **indices** for positions/distances).
+- **496 (next greater, value map):** build `num → next greater` over `nums2` (right-to-left, pop `≤ cur`), then look up `nums1`.
+- **739 (next greater, distance):** store indices; `ans[j] = i - j` on pop.
+- **84 (largest rectangle):** increasing stack of indices; the bar that pops `j` is `j`'s next-smaller-right, the newly-exposed top is its prev-smaller-left → `width = i - stack[-1] - 1`, `area = h * width`. Flush with a `0` sentinel via a **copy** (`heights + [0]`, don't mutate); handle the empty stack with `width = i` (cleaner than a `-1` sentinel — avoids the `heights[-1]` negative-index trap).
+- **Key insight: pop = resolve** — the popper is one bound, the newly-exposed top is the other. (Cousin of the monotonic-*deque* in 1696.)
+- **Gotchas:** the `heights[-1]` trap if you use a `-1` sentinel without an explicit `!= -1` guard; don't mutate the input to add a sentinel; choose `<`/`<=`/`>`/`>=` deliberately.
 
 ---
 
