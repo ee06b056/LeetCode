@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 25 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 28 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -103,11 +103,15 @@ data-structure walk.
 
 ## 7. Top-K Elements
 *Recognize:* k largest/smallest/most-frequent. Min-heap of size k (largest), max-heap (smallest), or bucket sort by frequency. Heap = O(n log k).
-- [ ] ⬜ **215** Kth Largest Element in an Array
-- [ ] ⬜ **347** Top K Frequent Elements
-- [ ] ⬜ **373** Find K Pairs with Smallest Sums
+- [x] ✅ **215** Kth Largest Element in an Array
+- [x] ✅ **347** Top K Frequent Elements
+- [x] ✅ **373** Find K Pairs with Smallest Sums
 
-**Notes:** _(fill as you go — `heapq`, tuple priorities, negate for max-heap)_
+**Notes:** The counterintuitive core: **a MIN-heap of size k gives the k LARGEST** — the smallest of your top-k sits at the root, evicted in O(log k) when a bigger one arrives. O(n log k), beats an O(n log n) sort when `k ≪ n`. (k smallest → max-heap of size k; `heapq` is min-only, so **negate for max**.)
+- **215 (kth largest):** heapify the first k, `heappushpop` the rest, `heap[0]` is the answer. (Bonus: **quickselect** is O(n) average.)
+- **347 (top-k frequent):** `Counter`, then min-heap of size k keyed by `(freq, num)` — ties fall back to the int `num`, so it stays comparable. (Alt: **bucket sort** by frequency = O(n), since freq ≤ n; or `Counter.most_common(k)`.)
+- **373 (k smallest pairs):** the sums form an **implicit sorted matrix** `M[i][j]=nums1[i]+nums2[j]`. Seed the heap with column 0 of `min(k, len1)` rows; pop the smallest, record it, push only its right neighbor `(i, j+1)` — j-only advance ⇒ each cell reached once, no dupes. **Guard the empty heap** (`if not h: break`) so `k > #pairs` returns all instead of crashing.
+- **Gotchas:** size-k **min**-heap for k-*largest* (not size-n max-heap); use **tuples** `(priority, …)` with a comparable tiebreaker; for 373, j-only advance + empty-heap guard.
 
 ---
 
