@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 28 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 31 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -117,11 +117,16 @@ data-structure walk.
 
 ## 8. Overlapping Intervals
 *Recognize:* merge/insert/count overlaps. Sort by start; merge when `end ≥ next.start`. For "remove fewest," sort by end and greedily keep.
-- [ ] ⬜ **56** Merge Intervals
-- [ ] ⬜ **57** Insert Interval
-- [ ] ⬜ **435** Non-Overlapping Intervals
+- [x] ✅ **56** Merge Intervals
+- [x] ✅ **57** Insert Interval
+- [x] ✅ **435** Non-Overlapping Intervals
 
-**Notes:** _(fill as you go)_
+**Notes:** Sort first — but the sort key depends on what you're optimizing for, and picking the wrong one gives a wrong-but-plausible answer.
+- **56 (merge overlapping):** sort by **start**; walk once, extending a running interval — `current[1] = max(current[1], next[1])`, not a plain overwrite, since that's what handles containment (`[1,10]` swallowing `[2,3]`). Extend when `next.start ≤ current.end` (touching intervals like `[1,4]`,`[4,5]` still merge), else flush and start fresh. A `None` sentinel for "no current interval yet" needs `is None`, not truthiness — an interval is a list, and `not []` is also `True`, so plain truthiness only works because LeetCode guarantees non-empty intervals.
+- **57 (insert into pre-sorted, non-overlapping):** no sort — the input's ordering guarantee is the whole reason this is O(n) instead of O(n log n). Three-way single pass per original interval: fully before the new one → keep as-is; fully after → flush whatever's pending (the new interval, or something it already absorbed) and swap the pending slot to this interval; otherwise → merge (`min` of starts, `max` of ends). The "pending" variable does double duty: starts out meaning "the new interval," but the moment that's flushed it starts relaying whichever original interval hasn't been placed yet.
+- **435 (remove fewest to de-overlap):** sort by **end**, not start — the greedy exchange-argument proof specifically needs "keep whichever interval finishes earliest." Track `current_end` (seed `float("-inf")` to dodge a first-iteration special case); keep an interval when `start ≥ current_end`, else count it as removed. Sorting by end also makes containment free: a wide interval that contains others always has the latest end, so it sorts last and is the one greedily dropped.
+- **Touching intervals:** overlapping for merge/insert (56/57 use strict `<`/`>` to detect the *disjoint* case) but **not** overlapping for erase (435's `≥` keeps `[1,2]`,`[2,3]` as two separate intervals) — same shape of check, opposite intent, so get the direction right per problem.
+- **Gotchas:** `max`/`min`, not overwrite, when merging bounds (breaks containment otherwise); binding a merge accumulator directly to an input sub-list (`current = interval`) mutates the caller's array in place — build a fresh `[start, end]` instead; wrong sort key (start vs end) is the single most common way to get 435 wrong while still looking plausible.
 
 ---
 
