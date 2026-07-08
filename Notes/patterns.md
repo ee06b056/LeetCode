@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 31 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 34 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -132,11 +132,18 @@ data-structure walk.
 
 ## 9. Modified Binary Search
 *Recognize:* sorted-but-rotated, or a 2D sorted matrix, or "find boundary/min." Decide which half is sorted, then narrow.
-- [ ] ⬜ **33** Search in Rotated Sorted Array
-- [ ] ⬜ **153** Find Minimum in Rotated Sorted Array
-- [ ] ⬜ **240** Search a 2D Matrix II
+- [x] ✅ **33** Search in Rotated Sorted Array
+- [x] ✅ **153** Find Minimum in Rotated Sorted Array
+- [x] ✅ **240** Search a 2D Matrix II
 
-**Notes:** _(fill as you go — builds on the §iterative-binary-search template, 704)_
+**Notes:** The reframe: binary search doesn't need "sorted" — it needs an **O(1) test that discards a predictable chunk of the search space**. Each problem breaks plain-sortedness differently and repairs the decision rule. **Two templates**, and mixing them is the classic infinite-loop bug:
+- **(A) Exact target (704, 33):** closed `[left, right]`, `while left <= right`, hit returns early, both moves `±1`, exhausted → `-1`.
+- **(B) Boundary converge (153):** `while left < right`, `left = mid + 1` / `right = mid` (mid may *be* the answer — keep it), no early return, answer where they meet. Pairing rule: floor-mid ⟹ `mid < right`, so `right = mid` still shrinks; `left = mid` would spin (mid can equal left). `right = mid` inside a `<=` loop = infinite loop.
+- **33 (rotated, find value):** at any mid **at least one half is properly sorted**; one comparison identifies which, then range-check the target against the sorted half's endpoints and enter-or-avoid it. Canonical decoupled check: `nums[left] <= target < nums[mid]` (the `<=` carries the equality). My variant (strict `>` + early `target == nums[left]` returns) is correct but **coupled** — deleting the early return breaks `[1,2,3], target=1`.
+- **153 (rotated, find min):** Template B, **anchor on `nums[right]`, never `nums[left]`**. `nums[mid] > nums[right]` ⟹ drop in `(mid, right]` → `left = mid + 1`; else `[mid..right]` ascending → `right = mid`. The left anchor is *ambiguous*: `nums[mid] > nums[left]` is true both for a fully-sorted window (min at `left`) and a kink-right window (min right of mid) — opposite moves, and the window *inevitably* becomes sorted as it converges (30/45 rotations failed). The right anchor's two worlds both put the min at-or-left-of mid — the ambiguity **folds into the same safe move**. Bonus: `mid < right` in-loop ⟹ never self-compares (the `[1,0]` trap).
+- **Anchor discipline (33 vs 153):** why left worked in 33 but not 153 — 33 draws a *weak* conclusion ("this half is sorted", true in both ambiguous worlds) then discriminates with a **second signal** (target range-check); 153 has no target, so its single comparison must decide the move alone. **Every comparison must unambiguously support the exact conclusion drawn from it** — prove each discard safe in every world consistent with the comparison.
+- **240 (2D row+col sorted):** not really binary search — **staircase from top-right**: `cur < target` → row can't contain it, `i += 1`; `cur > target` → column can't, `j -= 1`. One comparison discards a full row/column ⟹ O(m+n); works with duplicates (non-strict sort). Corner must have *opposing* moves (top-right / bottom-left); from top-left both moves increase — dead. Row-by-row BS is O(m log n), better only for degenerate shapes (m ≪ n).
+- **Gotchas:** template mixing (see pairing rule); left-anchoring 153; C# `left + (right - left) / 2` vs overflow (Python ints don't care); duplicates variants **81/154** break the sorted-half test on `nums[mid] == nums[anchor]` — shrink by one (`left += 1`), degrades to O(n) worst case.
 
 ---
 
