@@ -93,7 +93,11 @@ This repository is a personal practice space for the user to learn the languages
 
 ## Reviewing solutions
 
-Only review a solution when the user names it explicitly (e.g. "review 0009" or "look at PalindromeNumber"). Do not proactively review every file in the repo, batch-review recent commits, or volunteer reviews of solutions the user didn't ask about. When asked, give a structured read without auto-editing:
+Only review a solution when the user names it explicitly (e.g. "review 0009" or "look at PalindromeNumber"). Do not proactively review every file in the repo, batch-review recent commits, or volunteer reviews of solutions the user didn't ask about.
+
+**Cadence (per user request, 2026-07-08): review one problem at a time, as the user finishes it** — even mid-pattern during a multi-problem sweep. Do not ask the user to batch a pattern's problems into one review. Pattern-level close-out (tracker ticks, notes, commits, Progress.md sync) still happens once per pattern, when its last problem is done. Mid-pattern, keep follow-up suggestions minimal — the next problem is usually just the next one in the pattern.
+
+When asked, give a structured read without auto-editing:
 
 - **Correctness** — walk the algorithm, call out edge cases that pass and any that look suspicious (overflow, empty input, duplicates, negatives, off-by-one).
 - **Idiomatic language usage** — comment on language-specific patterns. This repo is partly about learning the languages, so call these out even when the algorithm is fine.
