@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 34 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 37 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -149,11 +149,17 @@ data-structure walk.
 
 ## 10. Binary Tree Traversal 🟦
 *Recognize:* the traversal order encodes the problem — PreOrder (root-first, paths), InOrder (sorted, BST), PostOrder (children-first, aggregates).
-- [ ] ⬜ **257** Binary Tree Paths *(PreOrder)*
-- [ ] ⬜ **230** Kth Smallest Element in a BST *(InOrder)*
-- [ ] ⬜ **124** Binary Tree Maximum Path Sum *(PostOrder)*
+- [x] ✅ **257** Binary Tree Paths *(PreOrder)*
+- [x] ✅ **230** Kth Smallest Element in a BST *(InOrder)*
+- [x] ✅ **124** Binary Tree Maximum Path Sum *(PostOrder)*
 
-**Notes:** _(fill as you go — you own trees from §10/§12; 124 is the tricky one)_
+**Notes:** **The traversal order encodes the problem** — root-first (PreOrder) when state flows parent→child; InOrder when the BST property should hand you sorted order; children-first (PostOrder) when a node's answer aggregates its subtrees. *(+ bonus rep: 543 Diameter as the 124 warm-up.)*
+- **257 (PreOrder, paths):** accumulate on the way down, emit `"->".join(...)` at leaves. Two accumulation styles, both worth owning: **shared list + append/pop** (choose → recurse → un-choose — Backtracking-pattern preview) vs **copy-on-push** (`path + [v]`, natural for the iterative stack form; push right first so left pops/emits first). **Leaf = both children `None`** — a one-child node is not a leaf. Pick ONE `None`-defense policy (guard at entry *or* at call sites), not both.
+- **230 (InOrder, BST):** in-order visits a BST in sorted order ⇒ kth smallest = kth visited. The point is **early termination** — O(h + k), don't finish the walk. Recursive form: guard on `len(seen) >= k` at entry *and* after the left-recursion; list-mutation dodges `nonlocal` (mutate-don't-rebind), at O(k) memory for a 1-value answer (`nonlocal count/result` would be O(1)). *Still to do: the generator form — `yield from` in-order + `islice` makes early stop automatic (the open `yield` TODO).* k is **1-indexed**.
+- **124 (PostOrder, the hard one):** every node computes **two different quantities** — **report up** the single-arm gain `val + max(0, l_b, r_b)` (a parent path can extend down only one arm), **record** the both-arms join `max(l_p, r_p, val + l_b + r_b)`. Clamps `max(0,·)` only on the *arms*, never on `val` itself. **Unify with the base case `None → (0, -inf)`** — two identities for two quantities: `0` = empty *extension* (identity of the clamp), `-inf` = *no path exists* (identity of max; can never beat a real path, which guarantees the answer is a non-empty path — all-negative trees return the least-negative node, never 0).
+- **The bug I actually wrote:** four-way branch on children-existence, with the record logic duplicated per branch — correct in the two-child copy, wrong in both single-child copies (dropped the child's record: `[-10, left=5]` → -5 instead of 5). **Duplicated logic rots independently; absorb the asymmetry into the base case.** The unpacked-but-unused `left_p` was the lint-smell pointing at it. And both LC examples are *full* trees — the single-child branches never even ran on them; 1,603/3,840 brute-force trees failed. Examples ≠ coverage.
+- **543 (Diameter — same skeleton, easier):** report height in *nodes*, record diameter in *edges*; through-node = `l_h + r_h`. **Sentinel contrast with 124:** empty-record identity `0` is safe here because 0 is an attainable valid answer (single node); 124 needed `-inf` because 0 would mean the forbidden empty path. *The no-answer sentinel must be unable to beat any real answer.*
+- **Gotchas:** leaf ≠ one-child node (257); k 1-indexed (230); init the record to `-inf` not 0 and never clamp `val` in the record candidate (124); per-branch duplicated logic (124); the report/record pair generalizes (543, 687, most hard tree problems).
 
 ---
 
@@ -213,3 +219,4 @@ data-structure walk.
 ## Not in this article (already done, complementary)
 Your recent **Trie** (208/211/212) and **Union-Find** (547/684/323/1319) work isn't among these 15 patterns —
 they're additional coverage. Likewise 49, 121, 125, 217, 235, 278, 383, 409, 704 and others sit outside the article's picks.
+**543 Diameter of Binary Tree** (2026-07-08) was solved as the deliberate warm-up for 124 — same report/record skeleton, lengths instead of sums.
