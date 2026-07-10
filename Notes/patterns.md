@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 38 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 40 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -179,11 +179,15 @@ data-structure walk.
 
 ## 12. Breadth-First Search 🟦
 *Recognize:* shortest path in an unweighted graph; level-order. Queue, process level by level.
-- [ ] ⬜ **102** Binary Tree Level Order Traversal
+- [x] ✅ **102** Binary Tree Level Order Traversal
 - [x] ✅ **994** Rotting Oranges — *done (multi-source BFS)*
-- [ ] ⬜ **127** Word Ladder
+- [x] ✅ **127** Word Ladder
 
-**Notes:** _(fill as you go)_
+**Notes:** BFS = shortest path in an *unweighted* graph, and level-order processing. Queue; the whole craft is in how you delimit levels and how you avoid re-visiting.
+- **102 (the level template, both forms):** ① **level-list swap** — `frontier` / `next_frontier`, swap at the bottom; materializes each level, natural when the output *is* per-level lists. ② **single `deque` + size snapshot** — `level_size = len(queue)` *before* draining; the queue grows mid-level, so the snapshot is the level boundary (the load-bearing line). Same O(n) time, O(width) space (worst ~n/2 at a full tree's bottom). Form ① is 127's shape; form ② generalizes when levels don't need to be objects.
+- **127 (the meaty one — the graph is implicit):** words = nodes, one-letter edits = edges. **Never build the graph pairwise** — O(N²·L) ≈ 125M char-ops = TLE; *index* it instead. **Wildcard buckets:** `hot → *ot/h*t/ho*`, a `pattern → [words]` map (O(N·L²) build) — the 49-Group-Anagrams move, the pattern *is* the hash key; two words are adjacent ⟺ they share a bucket; a bucket holds ≤ 26 words (members differ only at the wildcard). **Drain each bucket exactly once** (a visited-set on *patterns* ≡ clearing the bucket) — safe because BFS reaches a bucket first at minimal level, so any re-scan could only rediscover words the worse way. Don't materialize word→word adjacency for a one-shot query — lazy expansion does strictly less work and stops at `endWord`. Alternative neighbor gen: 25·L mutations + set membership (O(26·L²) per word, N-independent) — less code, same order at these constraints. `beginWord`: *look up* its patterns, never store it — nothing needs to discover it. Answer counts **words including `beginWord`** (levels + 1 at discovery).
+- **994 (prior):** multi-source BFS — seed every rotten orange at level 0; minutes = levels.
+- **Gotchas:** mark visited **on enqueue, not on pop** — else the same node enters the queue through many parents and the queue explodes; the mid-level `len(queue)` trap without a snapshot; `endWord not in wordList → 0` before any work; a leftover debug `print` of the 50k-entry bucket map is a TLE all by itself (caught in review); going without a word-level visited set works *only* because bucket-drain-once bounds total enqueues at N·L — kept deliberately, but the proof is implicit, so be able to say it out loud.
 
 ---
 
