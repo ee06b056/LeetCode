@@ -27,3 +27,27 @@ class Solution:
             return
         inorder(root)
         return topk[k - 1]
+    
+    def kthSmallest(self, root: TreeNode | None, k: int) -> int:
+        counter = 0
+        stack = []
+        def next() -> int:
+            nonlocal counter
+            if counter == 0:
+                cp = root
+                while cp is not None:
+                    stack.append(cp)
+                    cp = cp.left
+            p = stack.pop()
+            cp = p.right
+            while cp is not None:
+                stack.append(cp)
+                cp = cp.left
+            counter += 1
+            return p.val
+        for i in range(k):
+            if i == k - 1:
+                return next()
+            else:
+                next()
+        return -1
