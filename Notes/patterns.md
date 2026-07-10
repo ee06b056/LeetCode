@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 37 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 38 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -166,10 +166,14 @@ data-structure walk.
 ## 11. Depth-First Search 🟦
 *Recognize:* explore all paths/branches; connectivity; topological order. Recursion or explicit stack.
 - [x] ✅ **133** Clone Graph — *done*
-- [ ] ⬜ **113** Path Sum II
+- [x] ✅ **113** Path Sum II
 - [x] ✅ **210** Course Schedule II — *done (DFS + Kahn's)*
 
-**Notes:** _(fill as you go)_
+**Notes:** DFS = exhaust every branch/path; recursion by default, explicit stack when depth threatens (Python's ~1000 recursion limit).
+- **113 (path enumeration — the backtracking on-ramp):** 257's PreOrder skeleton plus a running sum, done shared-list append/pop style (choose → recurse → un-choose). **Two kinds of path-state, and only one needs un-choosing:** `path` is a *shared mutable* list — every frame sees the same object, so the exit must `pop()` what the entry appended; the running sum is a *per-frame int* — the call stack undoes it for free (the symmetric-looking `sum -= node.val` unwind in the first draft was dead code). **Copy at the leaf** (`path[:]`) — appending the live list fills the answer with aliased views of one finally-empty list; invisible on shallow examples. **No pruning** — negatives mean `path_sum > target` proves nothing. Leaf = both children `None` (an internal node whose prefix hits the target emits nothing). Reading a captured name needs no `nonlocal` — only *rebinding* does (the 6/19 rule, re-learned).
+- **133 Clone Graph (prior work):** DFS with an `old → clone` map that doubles as the visited set — create the clone and map it **before** recursing into neighbors, or cycles recurse forever.
+- **210 Course Schedule II (prior work):** topological order both ways — DFS finish-order reversed (needs an on-path/3-color cycle check) and Kahn's in-degree peeling (BFS cousin).
+- **Gotchas:** builtin shadowing is now a *named habit* — `sum` (643), `next` (230), `sum` again (113 first draft); rename (`path_sum`) or invert to count-down `remaining - node.val`, which also deletes the outer capture. Time is O(n) traversal but **Θ(n²) worst-case output** (caterpillar-of-zeros: ~n/2 matching leaves × ~n/2 depth) — the per-leaf copy is the real cost, not the walk.
 
 ---
 
