@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 41 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 40 / 48 done.** *(Count audited 2026-07-10: a +1 drift had crept in at the Pattern-5 close-out (6/24, 21 logged as 22) and propagated through every total since — checkbox count is the truth: 40 ✅, 8 ⬜.)* Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
