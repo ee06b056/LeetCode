@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 40 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 41 / 48 done.** Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -195,9 +195,15 @@ data-structure walk.
 *Recognize:* grid as an implicit graph; flood-fill / region problems. 4-dir `dirs`, mark visited in place.
 - [x] ✅ **733** Flood Fill — *done*
 - [x] ✅ **200** Number of Islands — *done*
-- [ ] ⬜ **130** Surrounded Regions
+- [x] ✅ **130** Surrounded Regions
 
-**Notes:** _(fill as you go — 130's trick: seed from the border)_
+**Notes:** Grid = implicit graph: 4-dir `dirs` tuple, bounds-check, mark visited **in place** (sentinel or sink) instead of a `visited` set.
+- **130 (the border-seed inversion):** don't hunt for surrounded regions — **invert the question: find what survives**. Seed every border `O`, flood-mark reachable cells with a sentinel (`A`), then one sweep: `O → X` (captured), `A → O` (restored). Seeding detail: column loops take all rows incl. corners; row loops run `range(1, n-1)` so corners aren't re-processed (harmless anyway — mark-before-append makes re-seeds no-ops, which is also what saves the degenerate m=1 board). O(m·n) time and worst-case space — optimal.
+- **Deque-as-stack gotcha (from the 130 review):** `deque.pop()` pops the **right** end — that's a stack, i.e. iterative **DFS**, not BFS. Fine for flood fill (order-agnostic + mark-on-enqueue = each cell once), but then a plain `list` says it honestly with no import; `popleft()` is what makes it BFS. In an order-sensitive problem (127, any shortest-distance grid) the same slip breaks correctness *silently* — flood fill forgives, distance-BFS doesn't.
+- **Recursion limit is a real constraint here:** 200×200 board ⇒ a region can be 40k cells ⇒ the recursive fill habit from 733/200 dies with `RecursionError` at ~1000 frames. The concrete case for P11's "recursion by default, explicit stack when depth threatens."
+- **733 Flood Fill (prior):** the base operation — guard the `new color == old color` no-op case or the fill self-triggers forever.
+- **200 Number of Islands (prior):** count the fills; sink visited land in place (`'1' → '0'`).
+- **Gotchas:** mark **before** enqueue, not on pop; an in-place sentinel must be restored in the final sweep; `r, l` for row/column fights the `r`/`c` grid convention (and bare `l` is the E741 habit's third appearance).
 
 ---
 
