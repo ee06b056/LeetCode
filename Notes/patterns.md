@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 40 / 48 done.** *(Count audited 2026-07-10: a +1 drift had crept in at the Pattern-5 close-out (6/24, 21 logged as 22) and propagated through every total since — checkbox count is the truth: 40 ✅, 8 ⬜.)* Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 43 / 48 done.** *(Count audited 2026-07-10: a +1 drift had crept in at the Pattern-5 close-out (6/24, 21 logged as 22) and propagated through every total since — checkbox count is the truth: 40 ✅, 8 ⬜.)* Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -209,11 +209,15 @@ data-structure walk.
 
 ## 14. Backtracking
 *Recognize:* enumerate all permutations/combinations/subsets/placements under constraints. Choose → recurse → un-choose.
-- [ ] ⬜ **46** Permutations
-- [ ] ⬜ **78** Subsets
-- [ ] ⬜ **51** N-Queens
+- [x] ✅ **46** Permutations
+- [x] ✅ **78** Subsets
+- [x] ✅ **51** N-Queens
 
-**Notes:** _(fill as you go — the bridge into DP; 212 used grid backtracking)_
+**Notes:** Choose → recurse → un-choose over a shared path. The craft is two decisions: *what state to thread* and *when to emit*. The three problems are the three shapes:
+- **46 (permutation shape):** the loop restarts at **0** every level with a `used` guard — order matters, depth = n, **emit at leaves only**. `used` holds **indices**, not values (robust to dup values — mirrors itertools' positions-are-distinct semantics — and is the 47 foundation; 47 = sort + skip-equal-siblings). `[False]*n` boolean array is the interview-standard guard; the in-place swap variant is O(1) bookkeeping but scrambles the input and complicates 47's dedup. O(n·n!).
+- **78 (subset shape):** the loop starts at a **start index** and only moves forward — no used-set, because order doesn't matter; **every node emits**, not just leaves. Two coherent emit pairings: emit-on-append + seed `[[]]`, or emit-at-entry + no seed — **mixing them double-counts the empty subset**. In the start-index form **the for-loop is the base case** (an explicit `index == n` guard is dead code). Iterative forms to own: **doubling** (`answer += [s + [x] for s in answer]` — works because the comprehension materializes before `+=`; the naive append-while-iterating version never terminates) and **bitmask** (subsets ↔ n-bit ints, `range(1 << n)` — the bijection that returns as bitmask DP). This skeleton is the chassis of 77 / 39 / 90. O(n·2ⁿ).
+- **51 (constraint-satisfaction capstone):** one queen per row ⇒ recursion is just "pick a column for row r" — the threaded state is **constraints, not the path**: `column[c]`, `main_d[r−c+n−1]` (↘ cells share r−c), `anti_d[r+c]` (↙ share r+c), the diagonal arrays sized 2n−1. Boolean "free" arrays beat sets (O(1) with no hashing). The un-choose discipline scales: 113 unwound one piece of shared state, 46 two, 51 **four** (board cell + three constraint slots) — every one symmetric and unconditional, or the search silently corrupts. Alternative: `queens[r] = col` list + render-at-emit deletes the board mutation entirely.
+- **Gotchas:** comprehension variables live in their own mini-scope and can shadow enclosing names (`for r in board` under parameter `r` — Py3-safe, Py2 leaked, landmine either way; rename); seed/emit mismatch double-counts `[]` (78); every choose needs exactly one un-choose on every path; copy at emit, always (`path[:]`, fresh strings) — the 113 aliasing lesson.
 
 ---
 
