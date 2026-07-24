@@ -10,7 +10,7 @@ data-structure walk.
 
 **Legend:** ✅ done in Python · ⬜ to do · 🟦 *pattern already owned from prior work — these specific problems are quick reps*
 
-**Progress: 47 / 48 done.** *(Count audited 2026-07-10: a +1 drift had crept in at the Pattern-5 close-out (6/24, 21 logged as 22) and propagated through every total since — checkbox count is the truth: 40 ✅, 8 ⬜.)* Recommended order (easy→hard, backtracking last as the bridge into DP):
+**Progress: 48 / 48 — SWEEP COMPLETE 2026-07-23.** *(Count audited 2026-07-10: a +1 drift had crept in at the Pattern-5 close-out (6/24, 21 logged as 22) and propagated through every total since — checkbox count is the truth: 40 ✅, 8 ⬜.)* Recommended order (easy→hard, backtracking last as the bridge into DP):
 **1 Prefix Sum → 2 Two Pointers → 3 Sliding Window → 6 Monotonic Stack → 7 Top-K → 8 Intervals → 9 Modified Binary Search → 5 LinkedList Reversal → 4 Fast/Slow → 10–13 Tree/DFS/BFS/Matrix (quick) → 14 Backtracking → 15 DP.**
 
 ---
@@ -228,9 +228,15 @@ data-structure walk.
 - [x] ✅ **322** Coin Change
 - [x] ✅ **1143** Longest Common Subsequence
 - [x] ✅ **300** Longest Increasing Subsequence
-- [ ] ⬜ **416** Partition Equal Subset Sum
+- [x] ✅ **416** Partition Equal Subset Sum
 
-**Notes:** _(deferred to the DP ladder — `dynamic-programming.md`)_
+**Notes:** the full treatment lives in **`dynamic-programming.md`** (opened at this close-out, 2026-07-23); ladder digest:
+
+- **Derivation pipeline (322):** brute recursion → memoize → flip bottom-up. Base case = the **identity** (`fewest(0) = 0`, seeded straight into the memo as `{0: 0}`); "amount == coin → 1" and "amount < min coin → ∞" are answers the recurrence derives itself — **absorb special cases into the base case, don't enumerate them** (the 124 lesson again). Entry-guard (`amount < 0 → ∞`) vs call-site guard (`c ≤ amount`): pick one — the 257 policy rule in DP clothing. Depth hazard: memo top-down runs ~amount/min(coin) frames deep — dies at Python's default ~1000 limit locally (LC raises it; reproduced on cue with coins=[1], amount=1500); bottom-up is immune, which is reason #1 the table form exists.
+- **198 (+ 70/509 warm-ups):** when the recurrence looks back only 2, the state is two rolling ints — no table needed. Dead guards on already-covered bases (`len == 1` / `n == 1`) are the *code-side mirror* of redundant base cases.
+- **1143 (first 2-D):** state = prefix pair. Equal-last-chars case is **forced** — `diag + 1`, no `max`: one added char raises LCS by ≤ 1, so both neighbors are ≤ diag+1 (tie possible, win impossible); exchange argument — nothing comes after the last characters. Mismatch = `max(up, left)` (drop one char, either side). The rolled-row classic bug: writing **diagonal** where **up** belongs — value then can't flow straight down (`ab`/`acb` → 1 instead of 2; 428/5,005 draft failures; a redundant running-max was masking part of it). **Write the 2-D table first, verify, then roll.** Array is indexed by the *inner* loop var → inner dimension = your space → shorter string inner ⇒ O(min(m,n)).
+- **300:** `dp[i]` = LIS **ending exactly at** `i` — a plain "first-i" length can't be extended (the state must carry what extension needs). **Where the answer lives is part of the state design:** prefix state (1143) → corner cell; ends-here state (300, Kadane 53) → max over all cells. Patience O(n log n) (greedy + bisect, *not* DP): `tails[k]` = smallest tail of any length-(k+1) increasing subsequence — sorted **by construction**, which is what legalizes bisect; append = length grows, replace = same length with easier future; `bisect_left` = the strictness switch; tails is a summary, **not a witness** (`[3,4,1]` → `[1,4]`).
+- **416 (capstone):** recognition first — "partition into two equal halves" *is* subset-sum to `S/2` (odd `S` → False before any DP). The 0/1 invariant: **this round's reads must see last round's state**, enforced by any of three mechanisms — two rows (1143), snapshot/copy (`list(sum_set)` — the 78-doubling move transferred), or the **backward 1-D inner loop** (canonical form). Forward on 1-D = *unbounded* knapsack = 322's bottom-up — **the inner-loop direction is the 0/1-vs-unbounded switch.** Review catch: `dp[0] = [True]` (a *list*, not a bool) passed 6,620 checks on pure truthiness — three accidents (only truth-tested, never returned, target ≥ 1) hid a wrong type; 56's `if not ci:` cousin. Type-check your seeds.
 
 ---
 
