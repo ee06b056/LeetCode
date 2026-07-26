@@ -18,8 +18,8 @@ Rules: first problem of each new section = case study; both memo + table forms f
 
 ## Side threads (one per week, per `Plan.md`)
 
-### Bits (week of 7/27)
-- [ ] 136 Single Number · [ ] 190 Reverse Bits · [ ] 191 Number of 1 Bits · [ ] 268 Missing Number · [ ] 338 Counting Bits · [ ] 260 Single Number III
+### Bits (week of 7/27) — **complete 2026-07-26, a day early**
+- [x] 136 Single Number · [x] 190 Reverse Bits · [x] 191 Number of 1 Bits · [x] 268 Missing Number · [x] 338 Counting Bits · [x] 260 Single Number III
 
 ### Binary search on the answer (week of 8/3)
 - [ ] 875 Koko Eating Bananas · [ ] 1011 Ship Packages · [ ] 410 Split Array Largest Sum · [ ] 1482 M Bouquets · [ ] 1552 Magnetic Force · [ ] 2226 Candies for K Children
