@@ -6,7 +6,7 @@ Rules: first problem of each new section = case study; both memo + table forms f
 
 ## DP backbone (endlesscheng 动态规划 题单, in list order)
 
-- [ ] **入门 DP** (climbing-stairs family) — solved: 0 *(ladder credit: 70 · 509 · 198 · 322)*
+- [ ] **入门 DP** (climbing-stairs family) — solved: 3 (746 · 213 · 740, 2026-07-26) *(ladder credit: 70 · 509 · 198 · 322)*
 - [ ] **网格图 DP** (grid paths) — solved: 0
 - [ ] **背包** (0/1 · unbounded · counting) — solved: 0 *(ladder credit: 416 0/1 · 322 unbounded)*
 - [ ] **经典线性 DP** (LCS / edit-distance family) — solved: 0 *(ladder credit: 1143 · 300)*
