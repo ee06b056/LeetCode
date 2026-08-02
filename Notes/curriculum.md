@@ -46,7 +46,7 @@ Grind75 at the 8 wk × 19 h setting = the full 169-question list. Audit result: 
 - [ ] 150 Evaluate RPN · [ ] 155 Min Stack · [ ] 224 Basic Calculator *(Hard)* · [ ] 227 Basic Calculator II · [ ] 394 Decode String · [ ] 735 Asteroid Collision · [ ] 895 Max Frequency Stack *(Hard)* · [ ] 32 Longest Valid Parentheses *(Hard)* · [ ] 42 Trapping Rain Water *(Hard)*
 
 ### Arrays, strings & matrix
-- [ ] 238 Product Except Self · [ ] 75 Sort Colors · [ ] 189 Rotate Array · [ ] 283 Move Zeroes · [ ] 844 Backspace Compare · [ ] 977 Squares of Sorted Array · [ ] 16 3Sum Closest · [ ] 41 First Missing Positive *(Hard)* · [ ] 48 Rotate Image · [ ] 54 Spiral Matrix · [ ] 73 Set Matrix Zeroes · [ ] 36 Valid Sudoku · [ ] 179 Largest Number · [ ] 31 Next Permutation · [ ] 271 Encode/Decode Strings *(P)* · [ ] 67 Add Binary
+- [ ] 238 Product Except Self · [ ] 75 Sort Colors · [ ] 189 Rotate Array · [x] 283 Move Zeroes · [ ] 844 Backspace Compare · [ ] 977 Squares of Sorted Array · [ ] 16 3Sum Closest · [ ] 41 First Missing Positive *(Hard)* · [ ] 48 Rotate Image · [ ] 54 Spiral Matrix · [ ] 73 Set Matrix Zeroes · [ ] 36 Valid Sudoku · [ ] 179 Largest Number · [ ] 31 Next Permutation · [ ] 271 Encode/Decode Strings *(P)* · [ ] 67 Add Binary
 
 ### Sliding window & binary search
 - [ ] 424 Longest Repeating Char Replacement · [ ] 438 Find All Anagrams · [ ] 239 Sliding Window Maximum *(Hard; 1696's deque)* · [ ] 658 Find K Closest Elements · [ ] 74 Search a 2D Matrix · [ ] 4 Median of Two Sorted Arrays *(Hard)*
