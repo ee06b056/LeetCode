@@ -46,13 +46,13 @@ Grind75 at the 8 wk × 19 h setting = the full 169-question list. Audit result: 
 - [ ] 150 Evaluate RPN · [ ] 155 Min Stack · [ ] 224 Basic Calculator *(Hard)* · [ ] 227 Basic Calculator II · [ ] 394 Decode String · [ ] 735 Asteroid Collision · [ ] 895 Max Frequency Stack *(Hard)* · [ ] 32 Longest Valid Parentheses *(Hard)* · [ ] 42 Trapping Rain Water *(Hard)*
 
 ### Arrays, strings & matrix
-- [ ] 238 Product Except Self · [ ] 75 Sort Colors · [ ] 189 Rotate Array · [x] 283 Move Zeroes · [ ] 844 Backspace Compare · [ ] 977 Squares of Sorted Array · [ ] 16 3Sum Closest · [ ] 41 First Missing Positive *(Hard)* · [ ] 48 Rotate Image · [ ] 54 Spiral Matrix · [ ] 73 Set Matrix Zeroes · [ ] 36 Valid Sudoku · [ ] 179 Largest Number · [ ] 31 Next Permutation · [ ] 271 Encode/Decode Strings *(P)* · [ ] 67 Add Binary
+- [ ] 238 Product Except Self · [ ] 75 Sort Colors · [ ] 189 Rotate Array · [x] 283 Move Zeroes · [x] 844 Backspace Compare · [x] 977 Squares of Sorted Array · [ ] 16 3Sum Closest · [ ] 41 First Missing Positive *(Hard)* · [ ] 48 Rotate Image · [ ] 54 Spiral Matrix · [ ] 73 Set Matrix Zeroes · [ ] 36 Valid Sudoku · [ ] 179 Largest Number · [ ] 31 Next Permutation · [ ] 271 Encode/Decode Strings *(P)* · [ ] 67 Add Binary
 
 ### Sliding window & binary search
 - [ ] 424 Longest Repeating Char Replacement · [ ] 438 Find All Anagrams · [ ] 239 Sliding Window Maximum *(Hard; 1696's deque)* · [ ] 658 Find K Closest Elements · [ ] 74 Search a 2D Matrix · [ ] 4 Median of Two Sorted Arrays *(Hard)*
 
 ### Linked list
-- [ ] 876 Middle of LL · [ ] 19 Remove Nth From End · [ ] 234 Palindrome LL · [ ] 328 Odd Even LL · [ ] 143 Reorder List · [ ] 148 Sort List · [ ] 61 Rotate List · [ ] 25 Reverse k-Group *(Hard)* · [ ] 23 Merge k Sorted Lists *(Hard)*
+- [x] 876 Middle of LL · [ ] 19 Remove Nth From End · [x] 234 Palindrome LL · [ ] 328 Odd Even LL · [ ] 143 Reorder List · [ ] 148 Sort List · [ ] 61 Rotate List · [ ] 25 Reverse k-Group *(Hard)* · [ ] 23 Merge k Sorted Lists *(Hard)*
 
 ### Trees & BST
 - [ ] 98 Validate BST · [ ] 105 Build from Preorder+Inorder · [ ] 108 Sorted Array → BST · [ ] 103 Zigzag Level Order · [ ] 437 Path Sum III · [ ] 572 Subtree of Another Tree · [ ] 662 Max Width · [ ] 863 All Nodes Distance K · [ ] 285 Inorder Successor *(P)* · [ ] 297 Serialize/Deserialize *(Hard)*
