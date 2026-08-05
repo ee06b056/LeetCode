@@ -4,10 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Personal LeetCode practice. The repo carries two parallel implementations as the user migrates from C# to Python:
+Personal LeetCode practice. The repo carries two language tracks; the migration from C# to Python is effectively complete, and **Python is the active track**:
 
-- **C#** — `LeetCode.CSharp/`, `LeetCode.CSharp.Tests/`, `LeetCode.sln`. Original track, both projects target `net10.0` with `ImplicitUsings` **disabled** and `Nullable` enabled. `LeetCode.CSharp` is a console project with no NuGet deps; `LeetCode.CSharp.Tests` uses xUnit (`xunit`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, `coverlet.collector`).
-- **Python** — `LeetCode.Python/`. Newer track from 2026-05-23. Python 3.14 (Homebrew on macOS, python.org on Windows), isolated in a venv at `LeetCode.Python/.venv/`. The venv is **per-machine and gitignored** — it does not transfer between OSes; recreate it from `requirements.txt` on each machine. pytest for tests, no other deps.
+- **Python** (active, default) — `LeetCode.Python/`. Started 2026-05-23; as of 2026-08 essentially all new problems land here. Python 3.14 (Homebrew on macOS, python.org on Windows), isolated in a venv at `LeetCode.Python/.venv/`. The venv is **per-machine and gitignored** — it does not transfer between OSes; recreate it from `requirements.txt` on each machine. pytest for tests, no other deps.
+- **C#** (dormant) — `LeetCode.CSharp/`, `LeetCode.CSharp.Tests/`, `LeetCode.sln`. Original track, kept for reference and still buildable, but no longer where new work goes. Both projects target `net10.0` with `ImplicitUsings` **disabled** and `Nullable` enabled. `LeetCode.CSharp` is a console project with no NuGet deps; `LeetCode.CSharp.Tests` uses xUnit (`xunit`, `xunit.runner.visualstudio`, `Microsoft.NET.Test.Sdk`, `coverlet.collector`).
+
+**Write new solutions in Python unless the user explicitly asks for C#.** When a problem needs a language and none is stated, assume Python.
 
 Shared `Notes/` (e.g. `Notes/data-structures.md`) contains language-comparative reference material that grows alongside both tracks.
 
